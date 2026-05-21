@@ -10,10 +10,11 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { getAdminCenters, updateCenterAdmin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/centers")({
-  head: () => ({ meta: [{ title: "Centers — Admin — Glowy" }] }),
+  head: () => ({ meta: [{ title: "Centers — Admin — Beauty Hub" }] }),
   component: Page,
 });
 
