@@ -22,6 +22,7 @@ import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminCentersRouteImport } from './routes/admin.centers'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -88,12 +89,18 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCentersRoute = AdminCentersRouteImport.update({
+  id: '/admin/centers',
+  path: '/admin/centers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/centers'
     | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/centers'
     | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/centers'
     | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/centers'
     | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/centers'
     | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/centers'
     | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   CentersRoute: typeof CentersRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminCentersRoute: typeof AdminCentersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/centers': {
+      id: '/admin/centers'
+      path: '/admin/centers'
+      fullPath: '/admin/centers'
+      preLoaderRoute: typeof AdminCentersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -310,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   CentersRoute: CentersRouteWithChildren,
   DashboardRoute: DashboardRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminCentersRoute: AdminCentersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
@@ -322,3 +343,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
