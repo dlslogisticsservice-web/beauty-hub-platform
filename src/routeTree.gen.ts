@@ -15,6 +15,7 @@ import { Route as CentersRouteImport } from './routes/centers'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
+import { Route as CenterBookingsRouteImport } from './routes/center.bookings'
 import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
@@ -50,6 +51,11 @@ const CenterDashboardRoute = CenterDashboardRouteImport.update({
   path: '/center/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CenterBookingsRoute = CenterBookingsRouteImport.update({
+  id: '/center/bookings',
+  path: '/center/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookServiceIdRoute = BookServiceIdRouteImport.update({
   id: '/book/$serviceId',
   path: '/book/$serviceId',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
+    | '/center/bookings'
     | '/center/dashboard'
     | '/centers/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
+    | '/center/bookings'
     | '/center/dashboard'
     | '/centers/$slug'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
+    | '/center/bookings'
     | '/center/dashboard'
     | '/centers/$slug'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   BookServiceIdRoute: typeof BookServiceIdRoute
+  CenterBookingsRoute: typeof CenterBookingsRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
 }
 
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/center/dashboard'
       fullPath: '/center/dashboard'
       preLoaderRoute: typeof CenterDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/bookings': {
+      id: '/center/bookings'
+      path: '/center/bookings'
+      fullPath: '/center/bookings'
+      preLoaderRoute: typeof CenterBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book/$serviceId': {
@@ -254,8 +274,19 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   BookServiceIdRoute: BookServiceIdRoute,
+  CenterBookingsRoute: CenterBookingsRoute,
   CenterDashboardRoute: CenterDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
