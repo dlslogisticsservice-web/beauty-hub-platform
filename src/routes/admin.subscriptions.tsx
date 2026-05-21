@@ -80,7 +80,7 @@ function Page() {
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All plans</SelectItem>
+              <SelectItem value="all">{t("admin.all_plans")}</SelectItem>
               {PLANS.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -90,18 +90,18 @@ function Page() {
           <table className="w-full text-sm">
             <thead className="bg-secondary/50 text-left">
               <tr>
-                <th className="px-4 py-3 font-medium">Center</th>
-                <th className="px-4 py-3 font-medium">Owner</th>
-                <th className="px-4 py-3 font-medium">Plan</th>
-                <th className="px-4 py-3 font-medium">Started</th>
-                <th className="px-4 py-3 font-medium">Expires</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Change plan</th>
+                <th className="px-4 py-3 font-medium">{t("common.center")}</th>
+                <th className="px-4 py-3 font-medium">{t("auth.email")}</th>
+                <th className="px-4 py-3 font-medium">{t("center.subscription")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.date")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.date")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.status")}</th>
+                <th className="px-4 py-3 font-medium">{t("admin.change_plan")}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No centers.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">{t("common.no_results")}</td></tr>
               ) : filtered.map((c) => {
                 const expired = c.subscription_expires_at && new Date(c.subscription_expires_at) < new Date();
                 return (
@@ -111,7 +111,7 @@ function Page() {
                     <td className="px-4 py-3"><Badge variant="secondary" className="capitalize">{c.subscription_plan}</Badge></td>
                     <td className="px-4 py-3 text-muted-foreground">{format(new Date(c.created_at), "PP")}</td>
                     <td className="px-4 py-3 text-muted-foreground">{c.subscription_expires_at ? format(new Date(c.subscription_expires_at), "PP") : "—"}</td>
-                    <td className="px-4 py-3">{c.subscription_plan === "free" ? <Badge variant="outline">Free</Badge> : expired ? <Badge className="bg-red-500/15 text-red-700 border-0">Expired</Badge> : <Badge className="bg-green-500/15 text-green-700 border-0">Active</Badge>}</td>
+                    <td className="px-4 py-3">{c.subscription_plan === "free" ? <Badge variant="outline">Free</Badge> : expired ? <Badge className="bg-red-500/15 text-red-700 border-0">{t("status.cancelled")}</Badge> : <Badge className="bg-green-500/15 text-green-700 border-0">{t("common.active")}</Badge>}</td>
                     <td className="px-4 py-3">
                       <Select value={c.subscription_plan} onValueChange={(v) => setPlan(c.id, v as "free"|"basic"|"pro"|"premium")}>
                         <SelectTrigger className="h-8 w-28"><SelectValue /></SelectTrigger>
