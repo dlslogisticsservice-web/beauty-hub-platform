@@ -8,7 +8,8 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { CenterCard } from "@/components/center-card";
 import { listCenters } from "@/lib/centers.functions";
 import { useI18n } from "@/hooks/use-i18n";
-import heroImg from "@/assets/hero.jpg";
+const HERO_IMG = "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&q=80";
+const HERO_IMG_FALLBACK = "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=1200&q=80";
 
 const featuredOpts = queryOptions({
   queryKey: ["centers", "featured"],
@@ -50,15 +51,21 @@ function HomePage() {
 
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero" />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${HERO_IMG})` }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-black/35" aria-hidden />
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
           <div className="flex flex-col justify-center">
             <span className="inline-flex w-fit items-center gap-2 rounded-full bg-card/80 px-3 py-1 text-xs font-medium text-primary backdrop-blur shadow-soft">
               <Sparkles className="h-3.5 w-3.5" /> {t("home.badge")}
             </span>
-            <h1 className="mt-6 text-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-6 text-display text-5xl leading-[1.05] text-white sm:text-6xl lg:text-7xl">
               {t("home.hero_title")}
             </h1>
-            <p className="mt-6 max-w-lg text-lg text-muted-foreground">
+            <p className="mt-6 max-w-lg text-lg text-white/85">
               {t("home.hero_subtitle")}
             </p>
 
@@ -103,9 +110,14 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative hidden lg:block">
             <div className="absolute -inset-4 rounded-[3rem] bg-gradient-primary opacity-20 blur-3xl" />
-            <img src={heroImg} alt="Elegant beauty arrangement" className="relative w-full rounded-[2rem] object-cover shadow-glow" />
+            <img
+              src={HERO_IMG}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = HERO_IMG_FALLBACK; }}
+              alt="Woman with glowing skin receiving a facial treatment"
+              className="relative w-full rounded-[2rem] object-cover shadow-glow"
+            />
           </div>
         </div>
       </section>
