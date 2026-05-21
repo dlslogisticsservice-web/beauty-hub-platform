@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { getAdminBookings } from "@/lib/admin.functions";
+import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/bookings")({
-  head: () => ({ meta: [{ title: "All bookings — Admin — Glowy" }] }),
+  head: () => ({ meta: [{ title: "All bookings — Admin — Beauty Hub" }] }),
   component: Page,
 });
 
