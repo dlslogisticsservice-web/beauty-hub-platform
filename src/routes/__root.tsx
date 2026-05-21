@@ -12,6 +12,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { I18nProvider } from "@/hooks/use-i18n";
 
 function NotFoundComponent() {
   return (
