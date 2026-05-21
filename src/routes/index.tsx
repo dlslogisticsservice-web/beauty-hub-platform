@@ -110,9 +110,14 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative hidden lg:block">
             <div className="absolute -inset-4 rounded-[3rem] bg-gradient-primary opacity-20 blur-3xl" />
-            <img src={heroImg} alt="Elegant beauty arrangement" className="relative w-full rounded-[2rem] object-cover shadow-glow" />
+            <img
+              src={HERO_IMG}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = HERO_IMG_FALLBACK; }}
+              alt="Woman with glowing skin receiving a facial treatment"
+              className="relative w-full rounded-[2rem] object-cover shadow-glow"
+            />
           </div>
         </div>
       </section>
