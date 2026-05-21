@@ -16,7 +16,7 @@ export const getServiceForBooking = createServerFn({ method: "GET" })
 
     const { data: center } = await supabaseAdmin
       .from("centers")
-      .select("id, name, name_ar, slug, logo_url, city, commission_rate")
+      .select("id, name, name_ar, slug, logo_url, city, country, commission_rate")
       .eq("id", service.center_id)
       .maybeSingle();
 

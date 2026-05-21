@@ -4,6 +4,8 @@ import { Star, MapPin, Phone, BadgeCheck, Crown, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { getCenterBySlug } from "@/lib/centers.functions";
+import { formatPrice } from "@/lib/currency";
+import { useI18n } from "@/hooks/use-i18n";
 
 const centerOpts = (slug: string) =>
   queryOptions({
@@ -43,6 +45,7 @@ export const Route = createFileRoute("/centers/$slug")({
 });
 
 function CenterPage() {
+  const { t, locale } = useI18n();
   const { slug } = Route.useParams();
   const { data } = useSuspenseQuery(centerOpts(slug));
   const center = data.center!;
@@ -77,12 +80,12 @@ function CenterPage() {
                   <h1 className="text-display text-4xl">{center.name}</h1>
                   {center.is_verified && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-primary">
-                      <BadgeCheck className="h-3 w-3" /> Verified
+                      <BadgeCheck className="h-3 w-3" /> {t("centers.verified")}
                     </span>
                   )}
                   {center.subscription_plan === "premium" && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--gold)]/90 px-2 py-0.5 text-xs">
-                      <Crown className="h-3 w-3" /> Premium
+                      <Crown className="h-3 w-3" /> {t("centers.featured")}
                     </span>
                   )}
                 </div>
@@ -98,7 +101,7 @@ function CenterPage() {
                   )}
                   <span className="flex items-center gap-1.5">
                     <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                    {center.rating_avg ? center.rating_avg.toFixed(1) : "No reviews"}{" "}
+                    {center.rating_avg ? center.rating_avg.toFixed(1) : t("centers.no_reviews")}{" "}
                     {center.rating_count > 0 && <span>({center.rating_count})</span>}
                   </span>
                 </div>
@@ -114,31 +117,30 @@ function CenterPage() {
           )}
         </div>
 
-        {/* Services */}
         <section className="mt-12">
-          <h2 className="text-display text-3xl">Services <span dir="rtl" className="text-primary text-xl">· الخدمات</span></h2>
+          <h2 className="text-display text-3xl">{t("centers.services")}</h2>
           {data.services.length === 0 ? (
-            <p className="mt-4 text-muted-foreground">No services listed yet.</p>
+            <p className="mt-4 text-muted-foreground">{t("center.no_services_title")}</p>
           ) : (
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {data.services.map((s) => (
                 <div key={s.id} className="rounded-2xl border border-border bg-card p-5 flex flex-col">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <span className="inline-block rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">{s.category}</span>
+                      <span className="inline-block rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">{t(`categories.${s.category}`)}</span>
                       <h3 className="text-display text-2xl mt-1.5">{s.name}</h3>
                       {s.name_ar && <p dir="rtl" className="text-muted-foreground text-sm">{s.name_ar}</p>}
                     </div>
                     <div className="text-right">
-                      <p className="text-display text-2xl text-primary">${s.price}</p>
+                      <p className="text-display text-2xl text-primary">{formatPrice(s.price, center.country, locale)}</p>
                       <p className="text-xs text-muted-foreground flex items-center justify-end gap-1 mt-0.5">
-                        <Clock className="h-3 w-3" /> {s.duration_minutes} min
+                        <Clock className="h-3 w-3" /> {s.duration_minutes} {t("common.minutes")}
                       </p>
                     </div>
                   </div>
                   {s.description && <p className="text-sm text-muted-foreground mt-3 flex-1">{s.description}</p>}
                   <Button asChild className="mt-4 rounded-full bg-gradient-primary">
-                    <Link to="/book/$serviceId" params={{ serviceId: s.id }}>Book now</Link>
+                    <Link to="/book/$serviceId" params={{ serviceId: s.id }}>{t("common.book_now")}</Link>
                   </Button>
                 </div>
               ))}
@@ -146,11 +148,10 @@ function CenterPage() {
           )}
         </section>
 
-        {/* Reviews */}
         <section className="mt-12 mb-16">
-          <h2 className="text-display text-3xl">Reviews <span dir="rtl" className="text-primary text-xl">· التقييمات</span></h2>
+          <h2 className="text-display text-3xl">{t("centers.reviews")}</h2>
           {data.reviews.length === 0 ? (
-            <p className="mt-4 text-muted-foreground">No reviews yet — be the first.</p>
+            <p className="mt-4 text-muted-foreground">{t("centers.no_reviews")}</p>
           ) : (
             <div className="mt-6 space-y-4">
               {data.reviews.map((r) => (

@@ -11,17 +11,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
+import { formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/book/$serviceId")({
-  head: () => ({ meta: [{ title: "Book a service — Glowy" }] }),
+  head: () => ({ meta: [{ title: "Book a service — Beauty Hub" }] }),
   component: BookingPage,
 });
 
-const HOURS = Array.from({ length: 13 }, (_, i) => 9 + i); // 09..21
+const HOURS = Array.from({ length: 13 }, (_, i) => 9 + i);
 
 function BookingPage() {
+  const { t, locale } = useI18n();
   const { serviceId } = Route.useParams();
   const navigate = useNavigate();
   const { user, isCustomer, isCenterOwner, isAdmin, loading: authLoading } = useAuth();
@@ -47,14 +50,16 @@ function BookingPage() {
     [slotsData],
   );
 
+  const country = svc?.center?.country ?? "EG";
+
   const onSubmit = async () => {
     if (!user) { navigate({ to: "/auth/login" }); return; }
     if (isCenterOwner && !isCustomer && !isAdmin) {
-      toast.error("Center owners cannot book. Sign up as a customer.");
+      toast.error(t("booking.owner_cannot_book"));
       return;
     }
     if (!date || time === null || !svc?.service || !svc.center) {
-      toast.error("Please pick a date and time.");
+      toast.error(t("booking.pick_required"));
       return;
     }
     const [hh] = time.split(":").map(Number);
@@ -74,7 +79,7 @@ function BookingPage() {
     });
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Booking confirmed! The center will contact you shortly.");
+    toast.success(t("booking.success"));
     navigate({ to: "/dashboard" });
   };
 
@@ -82,7 +87,7 @@ function BookingPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
-        <div className="mx-auto max-w-4xl px-6 py-16 flex-1">Loading…</div>
+        <div className="mx-auto max-w-4xl px-6 py-16 flex-1">{t("common.loading")}</div>
         <SiteFooter />
       </div>
     );
@@ -93,8 +98,8 @@ function BookingPage() {
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
         <div className="mx-auto max-w-2xl px-6 py-24 text-center flex-1">
-          <h1 className="text-display text-4xl">Service unavailable</h1>
-          <Link to="/centers" className="mt-6 inline-block text-primary hover:underline">← Browse centers</Link>
+          <h1 className="text-display text-4xl">{t("booking.unavailable")}</h1>
+          <Link to="/centers" className="mt-6 inline-block text-primary hover:underline">← {t("nav.centers")}</Link>
         </div>
         <SiteFooter />
       </div>
@@ -105,9 +110,8 @@ function BookingPage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-10 grid gap-6 md:grid-cols-[1fr_1.2fr] flex-1">
-        {/* Summary */}
         <div className="rounded-3xl border border-border bg-card p-6 shadow-soft h-fit">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Booking summary</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">{t("booking.summary")}</p>
           <h2 className="text-display text-3xl mt-2">{svc.service.name}</h2>
           {svc.service.name_ar && <p dir="rtl" className="text-primary text-display text-xl">{svc.service.name_ar}</p>}
           <div className="mt-5 space-y-2 text-sm">
@@ -115,26 +119,25 @@ function BookingPage() {
               <MapPin className="h-4 w-4" /> {svc.center.name} {svc.center.city && `· ${svc.center.city}`}
             </p>
             <p className="flex items-center gap-2 text-muted-foreground">
-              <Clock className="h-4 w-4" /> {svc.service.duration_minutes} minutes
+              <Clock className="h-4 w-4" /> {svc.service.duration_minutes} {t("common.minutes_full")}
             </p>
           </div>
           <div className="mt-6 pt-5 border-t flex items-center justify-between">
-            <span className="text-muted-foreground">Total</span>
-            <span className="text-display text-3xl text-primary">${svc.service.price}</span>
+            <span className="text-muted-foreground">{t("booking.total")}</span>
+            <span className="text-display text-3xl text-primary">{formatPrice(svc.service.price, country, locale)}</span>
           </div>
         </div>
 
-        {/* Form */}
         <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-          <h3 className="text-display text-2xl">Pick your slot</h3>
+          <h3 className="text-display text-2xl">{t("booking.pick_slot")}</h3>
 
           <div className="mt-5">
-            <label className="text-sm font-medium">Date</label>
+            <label className="text-sm font-medium">{t("booking.select_date")}</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className={cn("w-full justify-start mt-2 font-normal", !date && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : "Choose a date"}
+                  {date ? format(date, "PPP") : t("booking.choose_date")}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -144,7 +147,7 @@ function BookingPage() {
           </div>
 
           <div className="mt-5">
-            <label className="text-sm font-medium">Time</label>
+            <label className="text-sm font-medium">{t("booking.select_time")}</label>
             <div className="mt-2 grid grid-cols-4 sm:grid-cols-5 gap-2">
               {HOURS.map((h) => {
                 const label = `${String(h).padStart(2, "0")}:00`;
@@ -170,14 +173,14 @@ function BookingPage() {
           </div>
 
           <div className="mt-5">
-            <label className="text-sm font-medium">Notes (optional)</label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything the center should know?" className="mt-2" rows={3} maxLength={500} />
+            <label className="text-sm font-medium">{t("booking.notes")}</label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("booking.notes_placeholder")} className="mt-2" rows={3} maxLength={500} />
           </div>
 
           <Button onClick={onSubmit} disabled={submitting || !date || !time} className="w-full mt-6 rounded-full bg-gradient-primary shadow-soft" size="lg">
-            {submitting ? "Confirming…" : `Confirm booking · $${svc.service.price}`}
+            {submitting ? t("booking.confirming") : `${t("booking.confirm")} · ${formatPrice(svc.service.price, country, locale)}`}
           </Button>
-          {!user && <p className="text-xs text-muted-foreground mt-3 text-center">You'll be asked to sign in.</p>}
+          {!user && <p className="text-xs text-muted-foreground mt-3 text-center">{t("booking.sign_in_hint")}</p>}
         </div>
       </div>
       <SiteFooter />

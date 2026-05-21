@@ -45,7 +45,7 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
 
     const { data: recent } = await supabaseAdmin
       .from("bookings")
-      .select("id, scheduled_at, status, price_paid, commission_amount, customer_id, service_id, center_id, created_at")
+      .select("id, scheduled_at, status, price_paid, commission_amount, currency, customer_id, service_id, center_id, created_at")
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -53,7 +53,7 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
     const uIds = Array.from(new Set((recent ?? []).map((r) => r.customer_id)));
     const sIds = Array.from(new Set((recent ?? []).map((r) => r.service_id)));
     const [{ data: centers }, { data: profiles }, { data: services }] = await Promise.all([
-      cIds.length ? supabaseAdmin.from("centers").select("id, name, slug").in("id", cIds) : Promise.resolve({ data: [] }),
+      cIds.length ? supabaseAdmin.from("centers").select("id, name, slug, country").in("id", cIds) : Promise.resolve({ data: [] }),
       uIds.length ? supabaseAdmin.from("profiles").select("id, full_name, email").in("id", uIds) : Promise.resolve({ data: [] }),
       sIds.length ? supabaseAdmin.from("services").select("id, name").in("id", sIds) : Promise.resolve({ data: [] }),
     ]);
@@ -65,6 +65,7 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       ...b,
       center_name: cMap.get(b.center_id)?.name || "—",
       center_slug: cMap.get(b.center_id)?.slug,
+      country: (cMap.get(b.center_id) as { country?: string } | undefined)?.country ?? "EG",
       customer_name: pMap.get(b.customer_id)?.full_name || pMap.get(b.customer_id)?.email || "Customer",
       service_name: sMap.get(b.service_id)?.name || "—",
     }));
@@ -131,7 +132,7 @@ export const getAdminBookings = createServerFn({ method: "GET" })
     await assertAdmin(context.userId);
     let q = supabaseAdmin
       .from("bookings")
-      .select("id, scheduled_at, status, price_paid, commission_amount, customer_id, service_id, center_id, created_at")
+      .select("id, scheduled_at, status, price_paid, commission_amount, currency, customer_id, service_id, center_id, created_at")
       .order("scheduled_at", { ascending: false })
       .limit(200);
     if (data.status && data.status !== "all") q = q.eq("status", data.status as never);
@@ -142,7 +143,7 @@ export const getAdminBookings = createServerFn({ method: "GET" })
     const uIds = Array.from(new Set((rows ?? []).map((r) => r.customer_id)));
     const sIds = Array.from(new Set((rows ?? []).map((r) => r.service_id)));
     const [{ data: centers }, { data: profiles }, { data: services }, { data: allCenters }] = await Promise.all([
-      cIds.length ? supabaseAdmin.from("centers").select("id, name, slug").in("id", cIds) : Promise.resolve({ data: [] }),
+      cIds.length ? supabaseAdmin.from("centers").select("id, name, slug, country").in("id", cIds) : Promise.resolve({ data: [] }),
       uIds.length ? supabaseAdmin.from("profiles").select("id, full_name, email").in("id", uIds) : Promise.resolve({ data: [] }),
       sIds.length ? supabaseAdmin.from("services").select("id, name").in("id", sIds) : Promise.resolve({ data: [] }),
       supabaseAdmin.from("centers").select("id, name").order("name"),
@@ -155,6 +156,7 @@ export const getAdminBookings = createServerFn({ method: "GET" })
       ...b,
       center_name: cMap.get(b.center_id)?.name || "—",
       center_slug: cMap.get(b.center_id)?.slug,
+      country: (cMap.get(b.center_id) as { country?: string } | undefined)?.country ?? "EG",
       customer_name: pMap.get(b.customer_id)?.full_name || pMap.get(b.customer_id)?.email || "Customer",
       service_name: sMap.get(b.service_id)?.name || "—",
     }));

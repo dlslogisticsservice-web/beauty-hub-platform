@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 async function assertOwner(userId: string) {
   const { data: center } = await supabaseAdmin
     .from("centers")
-    .select("id, owner_id")
+    .select("id, owner_id, country")
     .eq("owner_id", userId)
     .maybeSingle();
   return center;
@@ -74,7 +74,7 @@ export const getCenterDashboard = createServerFn({ method: "GET" })
     }));
 
     return {
-      center: { id: center.id },
+      center: { id: center.id, country: center.country },
       stats: { totalBookings, revenue, commission, pending },
       todaysBookings,
     };
@@ -92,7 +92,7 @@ export const getCenterBookings = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     const center = await assertOwner(context.userId);
-    if (!center) return { bookings: [] };
+    if (!center) return { bookings: [], country: "EG" as const };
 
     let q = supabaseAdmin
       .from("bookings")
@@ -127,5 +127,5 @@ export const getCenterBookings = createServerFn({ method: "GET" })
       const s = data.search.toLowerCase();
       bookings = bookings.filter((b) => b.customer_name.toLowerCase().includes(s));
     }
-    return { bookings };
+    return { bookings, country: center.country ?? "EG" };
   });
