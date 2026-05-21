@@ -14,6 +14,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CentersRouteImport } from './routes/centers'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
+import { Route as CenterServicesRouteImport } from './routes/center.services'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
 import { Route as CenterBookingsRouteImport } from './routes/center.bookings'
 import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
@@ -45,6 +46,11 @@ const CentersSlugRoute = CentersSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => CentersRoute,
+} as any)
+const CenterServicesRoute = CenterServicesRouteImport.update({
+  id: '/center/services',
+  path: '/center/services',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CenterDashboardRoute = CenterDashboardRouteImport.update({
   id: '/center/dashboard',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/services': typeof CenterServicesRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/services': typeof CenterServicesRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRoutesById {
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/services': typeof CenterServicesRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/book/$serviceId'
     | '/center/bookings'
     | '/center/dashboard'
+    | '/center/services'
     | '/centers/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/book/$serviceId'
     | '/center/bookings'
     | '/center/dashboard'
+    | '/center/services'
     | '/centers/$slug'
   id:
     | '__root__'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/book/$serviceId'
     | '/center/bookings'
     | '/center/dashboard'
+    | '/center/services'
     | '/centers/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   BookServiceIdRoute: typeof BookServiceIdRoute
   CenterBookingsRoute: typeof CenterBookingsRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
+  CenterServicesRoute: typeof CenterServicesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/centers/$slug'
       preLoaderRoute: typeof CentersSlugRouteImport
       parentRoute: typeof CentersRoute
+    }
+    '/center/services': {
+      id: '/center/services'
+      path: '/center/services'
+      fullPath: '/center/services'
+      preLoaderRoute: typeof CenterServicesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/center/dashboard': {
       id: '/center/dashboard'
@@ -276,6 +296,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookServiceIdRoute: BookServiceIdRoute,
   CenterBookingsRoute: CenterBookingsRoute,
   CenterDashboardRoute: CenterDashboardRoute,
+  CenterServicesRoute: CenterServicesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
