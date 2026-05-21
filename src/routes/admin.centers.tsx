@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin/centers")({
 
 function Page() {
   const { user, isAdmin, loading } = useAuth();
-  const navigate = useNavigate();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [plan, setPlan] = useState("all");
