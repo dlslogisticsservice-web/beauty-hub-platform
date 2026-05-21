@@ -73,7 +73,7 @@ function Page() {
     const { error } = await supabase.storage.from("center-assets").upload(path, file, { upsert: true });
     if (error) return toast.error(error.message);
     const { data: pub } = supabase.storage.from("center-assets").getPublicUrl(path);
-    await supabase.from("centers").update({ [kind]: pub.publicUrl }).eq("id", centerId);
+    await supabase.from("centers").update({ [kind]: pub.publicUrl } as never).eq("id", centerId);
     if (kind === "logo_url") setLogo(pub.publicUrl); else setCover(pub.publicUrl);
     toast.success("Uploaded");
   };
