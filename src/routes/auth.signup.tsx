@@ -98,6 +98,13 @@ function SignupPage() {
             <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5" />
           </div>
           <div>
+            <Label htmlFor="country">Country</Label>
+            <select id="country" value={country} onChange={(e) => setCountry(e.target.value as "EG" | "SA")} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <option value="EG">🇪🇬 Egypt — مصر</option>
+              <option value="SA">🇸🇦 Saudi Arabia — السعودية</option>
+            </select>
+          </div>
+          <div>
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5" />
           </div>
