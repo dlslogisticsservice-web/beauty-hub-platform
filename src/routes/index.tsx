@@ -8,7 +8,8 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { CenterCard } from "@/components/center-card";
 import { listCenters } from "@/lib/centers.functions";
 import { useI18n } from "@/hooks/use-i18n";
-import heroImg from "@/assets/hero.jpg";
+const HERO_IMG = "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&q=80";
+const HERO_IMG_FALLBACK = "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=1200&q=80";
 
 const featuredOpts = queryOptions({
   queryKey: ["centers", "featured"],
