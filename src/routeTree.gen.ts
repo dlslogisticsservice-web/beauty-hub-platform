@@ -10,15 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CentersRouteImport } from './routes/centers'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
+import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
+import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CentersRoute = CentersRouteImport.update({
@@ -36,6 +45,16 @@ const CentersSlugRoute = CentersSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CentersRoute,
 } as any)
+const CenterDashboardRoute = CenterDashboardRouteImport.update({
+  id: '/center/dashboard',
+  path: '/center/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookServiceIdRoute = BookServiceIdRouteImport.update({
+  id: '/book/$serviceId',
+  path: '/book/$serviceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
   path: '/auth/signup',
@@ -46,30 +65,47 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/centers': typeof CentersRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/dashboard': typeof CenterDashboardRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/centers': typeof CentersRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/dashboard': typeof CenterDashboardRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/centers': typeof CentersRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/dashboard': typeof CenterDashboardRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRouteTypes {
@@ -77,34 +113,50 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/centers'
+    | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
+    | '/book/$serviceId'
+    | '/center/dashboard'
     | '/centers/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/centers'
+    | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
+    | '/book/$serviceId'
+    | '/center/dashboard'
     | '/centers/$slug'
   id:
     | '__root__'
     | '/'
     | '/centers'
+    | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
+    | '/book/$serviceId'
+    | '/center/dashboard'
     | '/centers/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CentersRoute: typeof CentersRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  BookServiceIdRoute: typeof BookServiceIdRoute
+  CenterDashboardRoute: typeof CenterDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -114,6 +166,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/centers': {
@@ -137,6 +196,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CentersSlugRouteImport
       parentRoute: typeof CentersRoute
     }
+    '/center/dashboard': {
+      id: '/center/dashboard'
+      path: '/center/dashboard'
+      fullPath: '/center/dashboard'
+      preLoaderRoute: typeof CenterDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book/$serviceId': {
+      id: '/book/$serviceId'
+      path: '/book/$serviceId'
+      fullPath: '/book/$serviceId'
+      preLoaderRoute: typeof BookServiceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/auth/signup'
@@ -149,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/login'
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -168,9 +248,13 @@ const CentersRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CentersRoute: CentersRouteWithChildren,
+  DashboardRoute: DashboardRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
+  BookServiceIdRoute: BookServiceIdRoute,
+  CenterDashboardRoute: CenterDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
