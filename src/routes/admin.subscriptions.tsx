@@ -26,6 +26,7 @@ const PLANS = [
 
 function Page() {
   const { user, isAdmin, loading } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [filter, setFilter] = useState("all");
