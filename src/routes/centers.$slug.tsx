@@ -22,13 +22,13 @@ export const Route = createFileRoute("/centers/$slug")({
   head: ({ loaderData }) => ({
     meta: loaderData?.center
       ? [
-          { title: `${loaderData.center.name} — Glowy` },
-          { name: "description", content: loaderData.center.description ?? `Book services at ${loaderData.center.name} on Glowy.` },
-          { property: "og:title", content: `${loaderData.center.name} — Glowy` },
+          { title: `${loaderData.center.name} — Beauty Hub` },
+          { name: "description", content: loaderData.center.description ?? `Book services at ${loaderData.center.name} on Beauty Hub.` },
+          { property: "og:title", content: `${loaderData.center.name} — Beauty Hub` },
           { property: "og:description", content: loaderData.center.description ?? "" },
           ...(loaderData.center.cover_url ? [{ property: "og:image", content: loaderData.center.cover_url }] : []),
         ]
-      : [{ title: "Center — Glowy" }],
+      : [{ title: "Center — Beauty Hub" }],
   }),
   component: CenterPage,
   notFoundComponent: () => (
@@ -36,7 +36,6 @@ export const Route = createFileRoute("/centers/$slug")({
       <SiteHeader />
       <div className="mx-auto max-w-2xl px-6 py-24 text-center">
         <h1 className="text-display text-5xl">Center not found</h1>
-        <p className="mt-4 text-muted-foreground">This center doesn't exist or is no longer active.</p>
         <Link to="/centers" className="mt-6 inline-block text-primary hover:underline">← Browse centers</Link>
       </div>
       <SiteFooter />
