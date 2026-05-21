@@ -1,5 +1,6 @@
 {
   "brand": { "name": "Beauty Hub", "tagline": "Your gateway to beauty, laser & wellness" },
+  "countries": { "eg": "Egypt", "sa": "Saudi Arabia" },
   "nav": {
     "home": "Home",
     "centers": "Browse",
