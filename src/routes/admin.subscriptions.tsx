@@ -8,11 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { getAdminSubscriptions, updateCenterAdmin } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/subscriptions")({
-  head: () => ({ meta: [{ title: "Subscriptions — Admin — Glowy" }] }),
+  head: () => ({ meta: [{ title: "Subscriptions — Admin — Beauty Hub" }] }),
   component: Page,
 });
 
