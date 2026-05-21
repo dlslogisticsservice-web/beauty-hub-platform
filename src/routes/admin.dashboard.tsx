@@ -40,6 +40,7 @@ function Stat({ icon: Icon, label, value }: { icon: typeof Calendar; label: stri
 
 function Page() {
   const { user, isAdmin, loading } = useAuth();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   useEffect(() => {
     if (loading) return;
@@ -57,21 +58,21 @@ function Page() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
-        <h1 className="text-display text-5xl">Admin dashboard</h1>
+        <h1 className="text-display text-5xl">{t("admin.dashboard")}</h1>
 
         {isLoading || !data ? (
-          <p className="mt-8 text-muted-foreground">Loading…</p>
+          <p className="mt-8 text-muted-foreground">{t("common.loading")}</p>
         ) : (
           <>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Stat icon={Calendar} label="Total bookings" value={String(data.stats.totalBookings)} />
-              <Stat icon={DollarSign} label="Platform revenue" value={`$${data.stats.revenue.toFixed(2)}`} />
-              <Stat icon={TrendingUp} label="Gross booking value" value={`$${data.stats.gross.toFixed(2)}`} />
-              <Stat icon={Store} label="Active centers" value={String(data.stats.activeCenters)} />
+              <Stat icon={Calendar} label={t("admin.total_bookings")} value={String(data.stats.totalBookings)} />
+              <Stat icon={DollarSign} label={t("admin.platform_revenue")} value={formatPrice(data.stats.revenue, "EG", locale)} />
+              <Stat icon={TrendingUp} label={t("admin.gross_value")} value={formatPrice(data.stats.gross, "EG", locale)} />
+              <Stat icon={Store} label={t("admin.active_centers")} value={String(data.stats.activeCenters)} />
             </div>
 
             <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
-              <h2 className="text-display text-2xl">Monthly commission revenue</h2>
+              <h2 className="text-display text-2xl">{t("admin.monthly_commission")}</h2>
               <div className="mt-6 h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.months}>
@@ -85,18 +86,18 @@ function Page() {
             </div>
 
             <section className="mt-10">
-              <h2 className="text-display text-2xl">Recent bookings</h2>
+              <h2 className="text-display text-2xl">{t("admin.recent_bookings")}</h2>
               <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
                 <table className="w-full text-sm">
                   <thead className="bg-secondary/50 text-left">
                     <tr>
-                      <th className="px-4 py-3 font-medium">Center</th>
-                      <th className="px-4 py-3 font-medium">Customer</th>
-                      <th className="px-4 py-3 font-medium">Service</th>
-                      <th className="px-4 py-3 font-medium">Amount</th>
-                      <th className="px-4 py-3 font-medium">Commission</th>
-                      <th className="px-4 py-3 font-medium">Status</th>
-                      <th className="px-4 py-3 font-medium">Date</th>
+                      <th className="px-4 py-3 font-medium">{t("common.center")}</th>
+                      <th className="px-4 py-3 font-medium">{t("common.customer")}</th>
+                      <th className="px-4 py-3 font-medium">{t("common.service")}</th>
+                      <th className="px-4 py-3 font-medium">{t("common.amount")}</th>
+                      <th className="px-4 py-3 font-medium">{t("admin.commissions")}</th>
+                      <th className="px-4 py-3 font-medium">{t("common.status")}</th>
+                      <th className="px-4 py-3 font-medium">{t("common.date")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -105,9 +106,9 @@ function Page() {
                         <td className="px-4 py-3">{b.center_slug ? <Link to="/centers/$slug" params={{ slug: b.center_slug }} className="hover:text-primary">{b.center_name}</Link> : b.center_name}</td>
                         <td className="px-4 py-3">{b.customer_name}</td>
                         <td className="px-4 py-3">{b.service_name}</td>
-                        <td className="px-4 py-3">${b.price_paid}</td>
-                        <td className="px-4 py-3">${b.commission_amount}</td>
-                        <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{b.status}</Badge></td>
+                        <td className="px-4 py-3">{formatPrice(Number(b.price_paid), b.country, locale)}</td>
+                        <td className="px-4 py-3">{formatPrice(Number(b.commission_amount), b.country, locale)}</td>
+                        <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge></td>
                         <td className="px-4 py-3 text-muted-foreground">{format(new Date(b.created_at), "PP")}</td>
                       </tr>
                     ))}
