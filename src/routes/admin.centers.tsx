@@ -39,14 +39,22 @@ function Page() {
     queryFn: () => getAdminCenters(),
   });
 
-  const update = async (id: string, patch: Parameters<typeof updateCenterAdmin>[0]["data"]) => {
-    const { error } = await (async () => {
-      try { await updateCenterAdmin({ data: patch }); return { error: null as Error | null }; }
-      catch (e) { return { error: e as Error }; }
-    })();
-    if (error) return toast.error(error.message);
-    toast.success("Updated");
-    qc.invalidateQueries({ queryKey: ["admin-centers"] });
+  type Patch = {
+    id: string;
+    is_verified?: boolean;
+    is_active?: boolean;
+    commission_rate?: number;
+    subscription_plan?: "free" | "basic" | "pro" | "premium";
+    subscription_expires_at?: string | null;
+  };
+  const update = async (patch: Patch) => {
+    try {
+      await updateCenterAdmin({ data: patch });
+      toast.success("Updated");
+      qc.invalidateQueries({ queryKey: ["admin-centers"] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
   };
 
   const filtered = useMemo(() => {
