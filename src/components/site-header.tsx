@@ -89,8 +89,6 @@ export function SiteHeader() {
                 {isAdmin && (
                   <>
                     <DropdownMenuItem onClick={() => navigate({ to: "/admin/dashboard" })}>{t("nav.admin")}</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate({ to: "/admin/commissions" })}>{t("nav.commissions")}</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate({ to: "/admin/system" })}>{t("nav.system")}</DropdownMenuItem>
                   </>
                 )}
                 {isCenterOwner && (
