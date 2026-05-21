@@ -23,20 +23,24 @@ function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState<"EG" | "SA">("EG");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data: signed, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: fullName, phone, role },
+        data: { full_name: fullName, phone, role, country },
       },
     });
+    if (!error && signed.user) {
+      await supabase.from("profiles").update({ country }).eq("id", signed.user.id);
+    }
     setLoading(false);
     if (error) {
       toast.error(error.message);
