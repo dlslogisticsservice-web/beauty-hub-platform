@@ -7,11 +7,13 @@ import { Calendar, DollarSign, TrendingUp, Store } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { getAdminDashboard } from "@/lib/admin.functions";
+import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Admin dashboard — Glowy" }] }),
+  head: () => ({ meta: [{ title: "Admin dashboard — Beauty Hub" }] }),
   component: Page,
 });
 
