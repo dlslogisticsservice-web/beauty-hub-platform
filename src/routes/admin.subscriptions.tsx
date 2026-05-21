@@ -47,7 +47,7 @@ function Page() {
     try {
       const expires = new Date(); expires.setMonth(expires.getMonth() + 1);
       await updateCenterAdmin({ data: { id, subscription_plan: plan, subscription_expires_at: plan === "free" ? null : expires.toISOString() } });
-      toast.success("Plan updated");
+      toast.success(t("common.save"));
       qc.invalidateQueries({ queryKey: ["admin-subs"] });
     } catch (e) { toast.error((e as Error).message); }
   };
