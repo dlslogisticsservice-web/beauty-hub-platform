@@ -9,12 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getCenterBookings } from "@/lib/center-owner.functions";
+import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/center/bookings")({
-  head: () => ({ meta: [{ title: "Bookings — Glowy" }] }),
+  head: () => ({ meta: [{ title: "Bookings — Beauty Hub" }] }),
   component: Page,
 });
 
@@ -26,6 +28,7 @@ const statusColors: Record<string, string> = {
 };
 
 function Page() {
+  const { t, locale } = useI18n();
   const { user, isCenterOwner, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -49,7 +52,7 @@ function Page() {
   const update = async (id: string, st: string) => {
     const { error } = await supabase.from("bookings").update({ status: st as never }).eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success(`Booking ${st}`);
+    toast.success(t(`status.${st}`));
     qc.invalidateQueries({ queryKey: ["center-bookings"] });
   };
 
@@ -62,32 +65,34 @@ function Page() {
     };
   }, [data]);
 
+  const country = data?.country ?? "EG";
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
-        <h1 className="text-display text-5xl">Bookings</h1>
+        <h1 className="text-display text-5xl">{t("center.all_bookings")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-4">
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="all">{t("admin.all_statuses")}</SelectItem>
+              <SelectItem value="pending">{t("status.pending")}</SelectItem>
+              <SelectItem value="confirmed">{t("status.confirmed")}</SelectItem>
+              <SelectItem value="completed">{t("status.completed")}</SelectItem>
+              <SelectItem value="cancelled">{t("status.cancelled")}</SelectItem>
             </SelectContent>
           </Select>
-          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} placeholder="From" />
-          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} placeholder="To" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search customer name…" />
+          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("center.search_customer")} />
         </div>
 
         <div className="mt-6 flex flex-wrap gap-6 rounded-2xl border border-border bg-card p-4 text-sm">
-          <span><strong>{summary.count}</strong> bookings</span>
-          <span>Revenue: <strong className="text-primary">${summary.revenue.toFixed(2)}</strong></span>
-          <span>Commission: <strong>${summary.commission.toFixed(2)}</strong></span>
+          <span><strong>{summary.count}</strong> {t("nav.bookings")}</span>
+          <span>{t("admin.revenue")}: <strong className="text-primary">{formatPrice(summary.revenue, country, locale)}</strong></span>
+          <span>{t("admin.commissions")}: <strong>{formatPrice(summary.commission, country, locale)}</strong></span>
         </div>
 
         <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
@@ -95,33 +100,33 @@ function Page() {
             <thead className="bg-secondary/50 text-left">
               <tr>
                 <th className="px-4 py-3 font-medium">#</th>
-                <th className="px-4 py-3 font-medium">Customer</th>
-                <th className="px-4 py-3 font-medium">Service</th>
-                <th className="px-4 py-3 font-medium">Scheduled</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Price</th>
-                <th className="px-4 py-3 font-medium">Commission</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
+                <th className="px-4 py-3 font-medium">{t("common.customer")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.service")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.scheduled_at")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.status")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.price")}</th>
+                <th className="px-4 py-3 font-medium">{t("admin.commissions")}</th>
+                <th className="px-4 py-3 font-medium text-right">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">{t("common.loading")}</td></tr>
               ) : (data?.bookings ?? []).length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">No bookings.</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">{t("common.no_results")}</td></tr>
               ) : (data?.bookings ?? []).map((b, i) => (
                 <tr key={b.id} className="border-t border-border">
                   <td className="px-4 py-3 text-muted-foreground">{i + 1}</td>
                   <td className="px-4 py-3">{b.customer_name}</td>
                   <td className="px-4 py-3">{b.service_name}</td>
                   <td className="px-4 py-3">{format(new Date(b.scheduled_at), "PP · p")}</td>
-                  <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{b.status}</Badge></td>
-                  <td className="px-4 py-3">${b.price_paid}</td>
-                  <td className="px-4 py-3">${b.commission_amount}</td>
+                  <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge></td>
+                  <td className="px-4 py-3">{formatPrice(b.price_paid, country, locale)}</td>
+                  <td className="px-4 py-3">{formatPrice(b.commission_amount, country, locale)}</td>
                   <td className="px-4 py-3 text-right whitespace-nowrap space-x-1.5">
-                    {b.status === "pending" && <Button size="sm" variant="outline" onClick={() => update(b.id, "confirmed")}>Confirm</Button>}
-                    {b.status === "confirmed" && <Button size="sm" variant="outline" onClick={() => update(b.id, "completed")}>Complete</Button>}
-                    {(b.status === "pending" || b.status === "confirmed") && <Button size="sm" variant="ghost" onClick={() => update(b.id, "cancelled")}>Cancel</Button>}
+                    {b.status === "pending" && <Button size="sm" variant="outline" onClick={() => update(b.id, "confirmed")}>{t("common.confirm")}</Button>}
+                    {b.status === "confirmed" && <Button size="sm" variant="outline" onClick={() => update(b.id, "completed")}>{t("common.complete")}</Button>}
+                    {(b.status === "pending" || b.status === "confirmed") && <Button size="sm" variant="ghost" onClick={() => update(b.id, "cancelled")}>{t("common.cancel")}</Button>}
                   </td>
                 </tr>
               ))}

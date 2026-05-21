@@ -11,19 +11,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
-  head: () => ({ meta: [{ title: "My bookings — Glowy" }] }),
+  head: () => ({ meta: [{ title: "My bookings — Beauty Hub" }] }),
   component: CustomerDashboard,
 });
 
 type Booking = {
-  id: string; scheduled_at: string; status: string; price_paid: number;
+  id: string; scheduled_at: string; status: string; price_paid: number; currency: string;
   service_id: string; center_id: string;
   services: { name: string } | null;
-  centers: { name: string; logo_url: string | null; slug: string } | null;
+  centers: { name: string; logo_url: string | null; slug: string; country: string | null } | null;
   reviews: { id: string }[];
 };
 
@@ -35,6 +37,7 @@ const statusColors: Record<string, string> = {
 };
 
 function CustomerDashboard() {
+  const { t, locale } = useI18n();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -49,7 +52,7 @@ function CustomerDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, scheduled_at, status, price_paid, service_id, center_id, services(name), centers(name, logo_url, slug), reviews(id)")
+        .select("id, scheduled_at, status, price_paid, currency, service_id, center_id, services(name), centers(name, logo_url, slug, country), reviews(id)")
         .eq("customer_id", user!.id)
         .order("scheduled_at", { ascending: false });
       if (error) throw error;
@@ -65,7 +68,7 @@ function CustomerDashboard() {
   const cancel = async (b: Booking) => {
     const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", b.id);
     if (error) return toast.error(error.message);
-    toast.success("Booking cancelled");
+    toast.success(t("status.cancelled"));
     qc.invalidateQueries({ queryKey: ["my-bookings"] });
   };
 
@@ -77,7 +80,7 @@ function CustomerDashboard() {
     });
     setSubmitting(false);
     if (error) return toast.error(error.message);
-    toast.success("Thanks for your review!");
+    toast.success(t("dashboard.leave_review"));
     setReviewFor(null); setComment(""); setRating(5);
     qc.invalidateQueries({ queryKey: ["my-bookings"] });
   };
@@ -88,13 +91,13 @@ function CustomerDashboard() {
   const past = all.filter((b) => b.status === "completed" || (b.status !== "cancelled" && new Date(b.scheduled_at).getTime() < now - 3600_000));
   const cancelled = all.filter((b) => b.status === "cancelled");
 
-  const renderList = (list: Booking[], emptyHint?: string) => {
+  const renderList = (list: Booking[], emptyHint: string) => {
     if (list.length === 0) {
       return (
         <div className="rounded-3xl border border-dashed border-border bg-card/50 p-16 text-center">
           <Sparkles className="mx-auto h-10 w-10 text-primary/50" />
-          <p className="mt-4 text-display text-2xl">{emptyHint ?? "Nothing here yet"}</p>
-          <Link to="/centers" className="mt-4 inline-block text-primary hover:underline">Discover centers →</Link>
+          <p className="mt-4 text-display text-2xl">{emptyHint}</p>
+          <Link to="/centers" className="mt-4 inline-block text-primary hover:underline">{t("dashboard.discover")}</Link>
         </div>
       );
     }
@@ -103,6 +106,7 @@ function CustomerDashboard() {
         {list.map((b) => {
           const canCancel = b.status === "pending" || b.status === "confirmed";
           const canReview = b.status === "completed" && (b.reviews?.length ?? 0) === 0;
+          const country = b.centers?.country ?? (b.currency === "SAR" ? "SA" : "EG");
           return (
             <div key={b.id} className="rounded-2xl border border-border bg-card p-5">
               <div className="flex gap-3">
@@ -113,16 +117,16 @@ function CustomerDashboard() {
                   <Link to="/centers/$slug" params={{ slug: b.centers?.slug ?? "" }} className="font-medium hover:text-primary truncate block">{b.centers?.name}</Link>
                   <p className="text-sm text-muted-foreground truncate">{b.services?.name}</p>
                 </div>
-                <Badge variant="outline" className={cn("border", statusColors[b.status])}>{b.status}</Badge>
+                <Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm">
                 <span className="flex items-center gap-1.5 text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> {format(new Date(b.scheduled_at), "PP · p")}</span>
-                <span className="text-display text-lg text-primary">${b.price_paid}</span>
+                <span className="text-display text-lg text-primary">{formatPrice(b.price_paid, country, locale)}</span>
               </div>
               {(canCancel || canReview) && (
                 <div className="mt-4 flex gap-2">
-                  {canCancel && <Button variant="outline" size="sm" onClick={() => cancel(b)}>Cancel</Button>}
-                  {canReview && <Button size="sm" className="rounded-full bg-gradient-primary" onClick={() => { setReviewFor(b); setRating(5); setComment(""); }}>Leave review</Button>}
+                  {canCancel && <Button variant="outline" size="sm" onClick={() => cancel(b)}>{t("dashboard.cancel_booking")}</Button>}
+                  {canReview && <Button size="sm" className="rounded-full bg-gradient-primary" onClick={() => { setReviewFor(b); setRating(5); setComment(""); }}>{t("dashboard.leave_review")}</Button>}
                 </div>
               )}
             </div>
@@ -136,21 +140,21 @@ function CustomerDashboard() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 flex-1">
-        <h1 className="text-display text-5xl">My bookings</h1>
-        <p className="mt-2 text-muted-foreground">Track upcoming, past and cancelled appointments.</p>
+        <h1 className="text-display text-5xl">{t("dashboard.title")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("dashboard.subtitle")}</p>
 
         {isLoading ? (
-          <p className="mt-10 text-muted-foreground">Loading…</p>
+          <p className="mt-10 text-muted-foreground">{t("common.loading")}</p>
         ) : (
           <Tabs defaultValue="upcoming" className="mt-8">
             <TabsList>
-              <TabsTrigger value="upcoming">Upcoming ({upcoming.length})</TabsTrigger>
-              <TabsTrigger value="past">Past ({past.length})</TabsTrigger>
-              <TabsTrigger value="cancelled">Cancelled ({cancelled.length})</TabsTrigger>
+              <TabsTrigger value="upcoming">{t("dashboard.upcoming")} ({upcoming.length})</TabsTrigger>
+              <TabsTrigger value="past">{t("dashboard.past")} ({past.length})</TabsTrigger>
+              <TabsTrigger value="cancelled">{t("dashboard.cancelled")} ({cancelled.length})</TabsTrigger>
             </TabsList>
-            <TabsContent value="upcoming" className="mt-6">{renderList(upcoming, "No upcoming bookings")}</TabsContent>
-            <TabsContent value="past" className="mt-6">{renderList(past, "No past bookings")}</TabsContent>
-            <TabsContent value="cancelled" className="mt-6">{renderList(cancelled, "No cancelled bookings")}</TabsContent>
+            <TabsContent value="upcoming" className="mt-6">{renderList(upcoming, t("dashboard.no_upcoming"))}</TabsContent>
+            <TabsContent value="past" className="mt-6">{renderList(past, t("dashboard.no_past"))}</TabsContent>
+            <TabsContent value="cancelled" className="mt-6">{renderList(cancelled, t("dashboard.no_cancelled"))}</TabsContent>
           </Tabs>
         )}
       </div>
@@ -158,7 +162,7 @@ function CustomerDashboard() {
       <Dialog open={!!reviewFor} onOpenChange={(o) => !o && setReviewFor(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rate {reviewFor?.centers?.name}</DialogTitle>
+            <DialogTitle>{t("dashboard.rate")} {reviewFor?.centers?.name}</DialogTitle>
           </DialogHeader>
           <div className="flex items-center gap-1 justify-center py-4">
             {[1,2,3,4,5].map((n) => (
@@ -167,10 +171,10 @@ function CustomerDashboard() {
               </button>
             ))}
           </div>
-          <Textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Share your experience…" rows={4} maxLength={500} />
+          <Textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t("dashboard.review_placeholder")} rows={4} maxLength={500} />
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setReviewFor(null)}>Cancel</Button>
-            <Button onClick={submitReview} disabled={submitting} className="bg-gradient-primary">{submitting ? "Sending…" : "Submit review"}</Button>
+            <Button variant="ghost" onClick={() => setReviewFor(null)}>{t("common.cancel")}</Button>
+            <Button onClick={submitReview} disabled={submitting} className="bg-gradient-primary">{submitting ? t("dashboard.sending_review") : t("dashboard.submit_review")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
