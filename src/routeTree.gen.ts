@@ -14,15 +14,19 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CentersRouteImport } from './routes/centers'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
+import { Route as CenterSubscriptionRouteImport } from './routes/center.subscription'
 import { Route as CenterServicesRouteImport } from './routes/center.services'
 import { Route as CenterProfileRouteImport } from './routes/center.profile'
+import { Route as CenterOnboardingRouteImport } from './routes/center.onboarding'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
 import { Route as CenterBookingsRouteImport } from './routes/center.bookings'
 import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AdminSystemRouteImport } from './routes/admin.system'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminCentersRouteImport } from './routes/admin.centers'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 
@@ -51,6 +55,11 @@ const CentersSlugRoute = CentersSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CentersRoute,
 } as any)
+const CenterSubscriptionRoute = CenterSubscriptionRouteImport.update({
+  id: '/center/subscription',
+  path: '/center/subscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CenterServicesRoute = CenterServicesRouteImport.update({
   id: '/center/services',
   path: '/center/services',
@@ -59,6 +68,11 @@ const CenterServicesRoute = CenterServicesRouteImport.update({
 const CenterProfileRoute = CenterProfileRouteImport.update({
   id: '/center/profile',
   path: '/center/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterOnboardingRoute = CenterOnboardingRouteImport.update({
+  id: '/center/onboarding',
+  path: '/center/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CenterDashboardRoute = CenterDashboardRouteImport.update({
@@ -86,6 +100,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSystemRoute = AdminSystemRouteImport.update({
+  id: '/admin/system',
+  path: '/admin/system',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
   id: '/admin/subscriptions',
   path: '/admin/subscriptions',
@@ -94,6 +113,11 @@ const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCommissionsRoute = AdminCommissionsRouteImport.update({
+  id: '/admin/commissions',
+  path: '/admin/commissions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCentersRoute = AdminCentersRouteImport.update({
@@ -114,15 +138,19 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/system': typeof AdminSystemRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/onboarding': typeof CenterOnboardingRoute
   '/center/profile': typeof CenterProfileRoute
   '/center/services': typeof CenterServicesRoute
+  '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRoutesByTo {
@@ -132,15 +160,19 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/system': typeof AdminSystemRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/onboarding': typeof CenterOnboardingRoute
   '/center/profile': typeof CenterProfileRoute
   '/center/services': typeof CenterServicesRoute
+  '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRoutesById {
@@ -151,15 +183,19 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/system': typeof AdminSystemRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/onboarding': typeof CenterOnboardingRoute
   '/center/profile': typeof CenterProfileRoute
   '/center/services': typeof CenterServicesRoute
+  '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
 export interface FileRouteTypes {
@@ -171,15 +207,19 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/bookings'
     | '/admin/centers'
+    | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/subscriptions'
+    | '/admin/system'
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
     | '/center/bookings'
     | '/center/dashboard'
+    | '/center/onboarding'
     | '/center/profile'
     | '/center/services'
+    | '/center/subscription'
     | '/centers/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -189,15 +229,19 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/bookings'
     | '/admin/centers'
+    | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/subscriptions'
+    | '/admin/system'
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
     | '/center/bookings'
     | '/center/dashboard'
+    | '/center/onboarding'
     | '/center/profile'
     | '/center/services'
+    | '/center/subscription'
     | '/centers/$slug'
   id:
     | '__root__'
@@ -207,15 +251,19 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/bookings'
     | '/admin/centers'
+    | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/subscriptions'
+    | '/admin/system'
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
     | '/center/bookings'
     | '/center/dashboard'
+    | '/center/onboarding'
     | '/center/profile'
     | '/center/services'
+    | '/center/subscription'
     | '/centers/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -226,15 +274,19 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCentersRoute: typeof AdminCentersRoute
+  AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
+  AdminSystemRoute: typeof AdminSystemRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   BookServiceIdRoute: typeof BookServiceIdRoute
   CenterBookingsRoute: typeof CenterBookingsRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
+  CenterOnboardingRoute: typeof CenterOnboardingRoute
   CenterProfileRoute: typeof CenterProfileRoute
   CenterServicesRoute: typeof CenterServicesRoute
+  CenterSubscriptionRoute: typeof CenterSubscriptionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -274,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CentersSlugRouteImport
       parentRoute: typeof CentersRoute
     }
+    '/center/subscription': {
+      id: '/center/subscription'
+      path: '/center/subscription'
+      fullPath: '/center/subscription'
+      preLoaderRoute: typeof CenterSubscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/center/services': {
       id: '/center/services'
       path: '/center/services'
@@ -286,6 +345,13 @@ declare module '@tanstack/react-router' {
       path: '/center/profile'
       fullPath: '/center/profile'
       preLoaderRoute: typeof CenterProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/onboarding': {
+      id: '/center/onboarding'
+      path: '/center/onboarding'
+      fullPath: '/center/onboarding'
+      preLoaderRoute: typeof CenterOnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/center/dashboard': {
@@ -323,6 +389,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/system': {
+      id: '/admin/system'
+      path: '/admin/system'
+      fullPath: '/admin/system'
+      preLoaderRoute: typeof AdminSystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/subscriptions': {
       id: '/admin/subscriptions'
       path: '/admin/subscriptions'
@@ -335,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/commissions': {
+      id: '/admin/commissions'
+      path: '/admin/commissions'
+      fullPath: '/admin/commissions'
+      preLoaderRoute: typeof AdminCommissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/centers': {
@@ -372,15 +452,19 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCentersRoute: AdminCentersRoute,
+  AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
+  AdminSystemRoute: AdminSystemRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   BookServiceIdRoute: BookServiceIdRoute,
   CenterBookingsRoute: CenterBookingsRoute,
   CenterDashboardRoute: CenterDashboardRoute,
+  CenterOnboardingRoute: CenterOnboardingRoute,
   CenterProfileRoute: CenterProfileRoute,
   CenterServicesRoute: CenterServicesRoute,
+  CenterSubscriptionRoute: CenterSubscriptionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

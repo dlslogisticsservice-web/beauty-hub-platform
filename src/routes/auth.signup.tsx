@@ -23,20 +23,24 @@ function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState<"EG" | "SA">("EG");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data: signed, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: fullName, phone, role },
+        data: { full_name: fullName, phone, role, country },
       },
     });
+    if (!error && signed.user) {
+      await supabase.from("profiles").update({ country }).eq("id", signed.user.id);
+    }
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -92,6 +96,13 @@ function SignupPage() {
           <div>
             <Label htmlFor="phone">Phone</Label>
             <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label htmlFor="country">Country</Label>
+            <select id="country" value={country} onChange={(e) => setCountry(e.target.value as "EG" | "SA")} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <option value="EG">🇪🇬 Egypt — مصر</option>
+              <option value="SA">🇸🇦 Saudi Arabia — السعودية</option>
+            </select>
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
