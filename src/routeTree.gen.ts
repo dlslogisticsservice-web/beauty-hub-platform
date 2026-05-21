@@ -21,6 +21,7 @@ import { Route as CenterBookingsRouteImport } from './routes/center.bookings'
 import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCentersRouteImport } from './routes/admin.centers'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
@@ -85,6 +86,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: '/admin/subscriptions',
+  path: '/admin/subscriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/admin/bookings'
     | '/admin/centers'
     | '/admin/dashboard'
+    | '/admin/subscriptions'
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/admin/bookings'
     | '/admin/centers'
     | '/admin/dashboard'
+    | '/admin/subscriptions'
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/admin/bookings'
     | '/admin/centers'
     | '/admin/dashboard'
+    | '/admin/subscriptions'
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCentersRoute: typeof AdminCentersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   BookServiceIdRoute: typeof BookServiceIdRoute
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/subscriptions': {
+      id: '/admin/subscriptions'
+      path: '/admin/subscriptions'
+      fullPath: '/admin/subscriptions'
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/admin/dashboard'
@@ -353,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCentersRoute: AdminCentersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   BookServiceIdRoute: BookServiceIdRoute,
