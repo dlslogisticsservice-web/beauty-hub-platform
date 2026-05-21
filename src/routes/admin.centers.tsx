@@ -71,23 +71,23 @@ function Page() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
-        <h1 className="text-display text-5xl">Centers</h1>
+        <h1 className="text-display text-5xl">{t("admin.centers")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name…" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("center.search_customer")} />
           <Select value={plan} onValueChange={setPlan}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All plans</SelectItem>
+              <SelectItem value="all">{t("admin.all_plans")}</SelectItem>
               {["free","basic","pro","premium"].map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={verified} onValueChange={setVerified}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All centers</SelectItem>
-              <SelectItem value="verified">Verified</SelectItem>
-              <SelectItem value="unverified">Unverified</SelectItem>
+              <SelectItem value="all">{t("admin.all_centers")}</SelectItem>
+              <SelectItem value="verified">{t("centers.verified")}</SelectItem>
+              <SelectItem value="unverified">{t("center.pending_verification")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -96,18 +96,18 @@ function Page() {
           <table className="w-full text-sm">
             <thead className="bg-secondary/50 text-left">
               <tr>
-                <th className="px-4 py-3 font-medium">Center</th>
-                <th className="px-4 py-3 font-medium">Owner</th>
-                <th className="px-4 py-3 font-medium">City</th>
-                <th className="px-4 py-3 font-medium">Plan</th>
-                <th className="px-4 py-3 font-medium">Commission %</th>
-                <th className="px-4 py-3 font-medium">Verified</th>
-                <th className="px-4 py-3 font-medium">Active</th>
+                <th className="px-4 py-3 font-medium">{t("common.center")}</th>
+                <th className="px-4 py-3 font-medium">{t("auth.email")}</th>
+                <th className="px-4 py-3 font-medium">{t("centers.filter_city")}</th>
+                <th className="px-4 py-3 font-medium">{t("center.subscription")}</th>
+                <th className="px-4 py-3 font-medium">{t("admin.commissions")} %</th>
+                <th className="px-4 py-3 font-medium">{t("centers.verified")}</th>
+                <th className="px-4 py-3 font-medium">{t("common.active")}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No centers.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">{t("common.no_results")}</td></tr>
               ) : filtered.map((c) => (
                 <tr key={c.id} className="border-t border-border">
                   <td className="px-4 py-3 font-medium">{c.name}</td>
