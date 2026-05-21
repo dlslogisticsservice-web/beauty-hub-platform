@@ -23,6 +23,7 @@ import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCentersRouteImport } from './routes/admin.centers'
+import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -94,12 +95,18 @@ const AdminCentersRoute = AdminCentersRouteImport.update({
   path: '/admin/centers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminBookingsRoute = AdminBookingsRouteImport.update({
+  id: '/admin/bookings',
+  path: '/admin/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/centers'
     | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/bookings'
     | '/admin/centers'
     | '/admin/dashboard'
     | '/auth/login'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/centers'
     | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/bookings'
     | '/admin/centers'
     | '/admin/dashboard'
     | '/auth/login'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/centers'
     | '/dashboard'
     | '/sitemap.xml'
+    | '/admin/bookings'
     | '/admin/centers'
     | '/admin/dashboard'
     | '/auth/login'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   CentersRoute: typeof CentersRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCentersRoute: typeof AdminCentersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AuthLoginRoute: typeof AuthLoginRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCentersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/bookings': {
+      id: '/admin/bookings'
+      path: '/admin/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -330,6 +350,7 @@ const rootRouteChildren: RootRouteChildren = {
   CentersRoute: CentersRouteWithChildren,
   DashboardRoute: DashboardRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminBookingsRoute: AdminBookingsRoute,
   AdminCentersRoute: AdminCentersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AuthLoginRoute: AuthLoginRoute,
@@ -343,3 +364,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
