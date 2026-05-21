@@ -62,10 +62,10 @@ function HomePage() {
             <span className="inline-flex w-fit items-center gap-2 rounded-full bg-card/80 px-3 py-1 text-xs font-medium text-primary backdrop-blur shadow-soft">
               <Sparkles className="h-3.5 w-3.5" /> {t("home.badge")}
             </span>
-            <h1 className="mt-6 text-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-6 text-display text-5xl leading-[1.05] text-white sm:text-6xl lg:text-7xl">
               {t("home.hero_title")}
             </h1>
-            <p className="mt-6 max-w-lg text-lg text-muted-foreground">
+            <p className="mt-6 max-w-lg text-lg text-white/85">
               {t("home.hero_subtitle")}
             </p>
 
