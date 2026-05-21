@@ -38,7 +38,9 @@ export function SiteHeader() {
               <Link to="/admin/dashboard" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.admin")}</Link>
               <Link to="/admin/centers" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.centers")}</Link>
               <Link to="/admin/bookings" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.bookings")}</Link>
+              <Link to="/admin/commissions" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.commissions")}</Link>
               <Link to="/admin/subscriptions" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.plans")}</Link>
+              {isSuperAdmin && <Link to="/admin/system" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.system")}</Link>}
             </>
           )}
           {isCenterOwner && !isAdmin && (
@@ -46,6 +48,7 @@ export function SiteHeader() {
               <Link to="/center/dashboard" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.dashboard")}</Link>
               <Link to="/center/bookings" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.bookings")}</Link>
               <Link to="/center/services" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.services")}</Link>
+              <Link to="/center/subscription" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.plans")}</Link>
               <Link to="/center/profile" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("nav.profile")}</Link>
             </>
           )}
