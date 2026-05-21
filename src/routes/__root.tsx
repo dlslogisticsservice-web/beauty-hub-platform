@@ -12,6 +12,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { I18nProvider } from "@/hooks/use-i18n";
 
 function NotFoundComponent() {
   return (
@@ -56,10 +57,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Glowy — Book Beauty, Laser & Aesthetic Clinics" },
-      { name: "description", content: "Glowy (جلوي) — discover, compare and book top beauty, laser, filler and botox clinics in your city." },
-      { property: "og:title", content: "Glowy — Beauty & Laser Booking" },
-      { property: "og:description", content: "Discover and book the best beauty, laser and aesthetic clinics near you." },
+      { title: "Beauty Hub — Book Beauty, Laser & Wellness Clinics" },
+      { name: "description", content: "Beauty Hub (بيوتي هب) — your gateway to beauty, laser & wellness across Egypt and Saudi Arabia." },
+      { property: "og:title", content: "Beauty Hub — Beauty & Laser Booking" },
+      { property: "og:description", content: "Your gateway to beauty, laser & wellness." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -105,9 +106,11 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthListener />
-      <Outlet />
-      <Toaster position="top-center" richColors />
+      <I18nProvider>
+        <AuthListener />
+        <Outlet />
+        <Toaster position="top-center" richColors />
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
