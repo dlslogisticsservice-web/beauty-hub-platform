@@ -61,14 +61,14 @@ function Page() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
-        <h1 className="text-display text-5xl">Subscriptions</h1>
+        <h1 className="text-display text-5xl">{t("admin.subscriptions")}</h1>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PLANS.map((p) => (
             <div key={p.id} className={cn("rounded-2xl border bg-card p-5 shadow-soft", p.id === "premium" && "border-primary")}>
               <h3 className="text-display text-2xl">{p.name}</h3>
-              <p className="text-3xl text-display text-primary mt-1">${p.price}<span className="text-sm text-muted-foreground">/mo</span></p>
-              <p className="mt-2 text-xs text-muted-foreground">{data?.counts?.[p.id] ?? 0} centers</p>
+              <p className="text-3xl text-display text-primary mt-1">${p.price}<span className="text-sm text-muted-foreground">{t("plans.month")}</span></p>
+              <p className="mt-2 text-xs text-muted-foreground">{data?.counts?.[p.id] ?? 0} {t("admin.centers_on_plan")}</p>
               <ul className="mt-4 space-y-1.5 text-sm">
                 {p.features.map((f) => <li key={f} className="flex gap-2"><Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />{f}</li>)}
               </ul>
