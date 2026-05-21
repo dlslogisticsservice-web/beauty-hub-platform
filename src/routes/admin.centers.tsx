@@ -52,7 +52,7 @@ function Page() {
   const update = async (patch: Patch) => {
     try {
       await updateCenterAdmin({ data: patch });
-      toast.success("Updated");
+      toast.success(t("common.save"));
       qc.invalidateQueries({ queryKey: ["admin-centers"] });
     } catch (e) {
       toast.error((e as Error).message);
