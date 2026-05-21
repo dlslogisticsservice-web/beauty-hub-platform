@@ -51,6 +51,12 @@ function HomePage() {
 
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero" />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${HERO_IMG})` }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-black/35" aria-hidden />
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
           <div className="flex flex-col justify-center">
             <span className="inline-flex w-fit items-center gap-2 rounded-full bg-card/80 px-3 py-1 text-xs font-medium text-primary backdrop-blur shadow-soft">
