@@ -14,12 +14,49 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           center_id: string
           commission_amount: number
           commission_rate: number
           created_at: string
+          currency: string
           customer_id: string
           id: string
           notes: string | null
@@ -33,6 +70,7 @@ export type Database = {
           commission_amount?: number
           commission_rate?: number
           created_at?: string
+          currency?: string
           customer_id: string
           id?: string
           notes?: string | null
@@ -46,6 +84,7 @@ export type Database = {
           commission_amount?: number
           commission_rate?: number
           created_at?: string
+          currency?: string
           customer_id?: string
           id?: string
           notes?: string | null
@@ -76,6 +115,8 @@ export type Database = {
           address: string | null
           city: string | null
           commission_rate: number
+          commission_tier_id: string | null
+          country: string
           cover_url: string | null
           created_at: string
           description: string | null
@@ -100,6 +141,8 @@ export type Database = {
           address?: string | null
           city?: string | null
           commission_rate?: number
+          commission_tier_id?: string | null
+          country?: string
           cover_url?: string | null
           created_at?: string
           description?: string | null
@@ -124,6 +167,8 @@ export type Database = {
           address?: string | null
           city?: string | null
           commission_rate?: number
+          commission_tier_id?: string | null
+          country?: string
           cover_url?: string | null
           created_at?: string
           description?: string | null
@@ -144,11 +189,65 @@ export type Database = {
           subscription_expires_at?: string | null
           subscription_plan?: Database["public"]["Enums"]["subscription_plan"]
         }
+        Relationships: [
+          {
+            foreignKeyName: "centers_commission_tier_id_fkey"
+            columns: ["commission_tier_id"]
+            isOneToOne: false
+            referencedRelation: "commission_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commission_tiers: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          rate_percent: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          rate_percent: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          rate_percent?: number
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          key: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key?: string
+        }
         Relationships: []
       }
       profiles: {
         Row: {
           avatar_url: string | null
+          country: string | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -158,6 +257,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -167,6 +267,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -267,6 +368,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          analytics_access: boolean
+          appears_in_search: boolean
+          description_ar: string | null
+          description_en: string | null
+          featured_badge: boolean
+          id: string
+          max_photos: number
+          max_services: number
+          name_ar: string
+          name_en: string
+          price_egp: number
+          price_sar: number
+          priority_rank: number
+          whatsapp_notifications: boolean
+        }
+        Insert: {
+          analytics_access?: boolean
+          appears_in_search?: boolean
+          description_ar?: string | null
+          description_en?: string | null
+          featured_badge?: boolean
+          id: string
+          max_photos?: number
+          max_services?: number
+          name_ar: string
+          name_en: string
+          price_egp?: number
+          price_sar?: number
+          priority_rank?: number
+          whatsapp_notifications?: boolean
+        }
+        Update: {
+          analytics_access?: boolean
+          appears_in_search?: boolean
+          description_ar?: string | null
+          description_en?: string | null
+          featured_badge?: boolean
+          id?: string
+          max_photos?: number
+          max_services?: number
+          name_ar?: string
+          name_en?: string
+          price_egp?: number
+          price_sar?: number
+          priority_rank?: number
+          whatsapp_notifications?: boolean
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
