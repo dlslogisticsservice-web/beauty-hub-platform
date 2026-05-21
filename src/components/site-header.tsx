@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function SiteHeader() {
-  const { isAuthenticated, user, isAdmin, isCenterOwner, signOut } = useAuth();
+  const { isAuthenticated, user, isAdmin, isCenterOwner, isCustomer, signOut } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -27,9 +27,28 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-6 md:flex">
           <Link to="/" className="text-sm hover:text-primary transition-colors">Home</Link>
-          <Link to="/centers" className="text-sm hover:text-primary transition-colors">Browse Centers</Link>
+          <Link to="/centers" className="text-sm hover:text-primary transition-colors">Browse</Link>
+          {isAdmin && (
+            <>
+              <Link to="/admin/dashboard" className="text-sm hover:text-primary transition-colors">Admin</Link>
+              <Link to="/admin/centers" className="text-sm hover:text-primary transition-colors">Centers</Link>
+              <Link to="/admin/bookings" className="text-sm hover:text-primary transition-colors">Bookings</Link>
+              <Link to="/admin/subscriptions" className="text-sm hover:text-primary transition-colors">Plans</Link>
+            </>
+          )}
+          {isCenterOwner && !isAdmin && (
+            <>
+              <Link to="/center/dashboard" className="text-sm hover:text-primary transition-colors">Dashboard</Link>
+              <Link to="/center/bookings" className="text-sm hover:text-primary transition-colors">Bookings</Link>
+              <Link to="/center/services" className="text-sm hover:text-primary transition-colors">Services</Link>
+              <Link to="/center/profile" className="text-sm hover:text-primary transition-colors">Profile</Link>
+            </>
+          )}
+          {isCustomer && !isCenterOwner && !isAdmin && (
+            <Link to="/dashboard" className="text-sm hover:text-primary transition-colors">My Bookings</Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -54,18 +73,15 @@ export function SiteHeader() {
                 <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/admin/dashboard" as never })}>
-                    Admin dashboard
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/admin/dashboard" })}>Admin dashboard</DropdownMenuItem>
                 )}
                 {isCenterOwner && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/center/dashboard" as never })}>
-                    Center dashboard
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem onClick={() => navigate({ to: "/center/dashboard" })}>Center dashboard</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate({ to: "/center/profile" })}>Center profile</DropdownMenuItem>
+                  </>
                 )}
-                <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" as never })}>
-                  My bookings
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" })}>My bookings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut className="h-4 w-4 mr-2" /> Sign out
