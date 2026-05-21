@@ -25,6 +25,7 @@ const statusColors: Record<string, string> = {
 
 function Page() {
   const { user, isAdmin, loading } = useAuth();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const [status, setStatus] = useState("all");
   const [centerId, setCenterId] = useState("all");
