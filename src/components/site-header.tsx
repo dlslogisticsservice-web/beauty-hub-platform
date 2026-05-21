@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function SiteHeader() {
-  const { isAuthenticated, user, isAdmin, isCenterOwner, isCustomer, signOut } = useAuth();
+  const { isAuthenticated, user, isAdmin, isSuperAdmin, isCenterOwner, isCustomer, signOut } = useAuth();
   const { t, locale, setLocale } = useI18n();
   const navigate = useNavigate();
 
