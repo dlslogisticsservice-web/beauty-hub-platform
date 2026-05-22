@@ -32,7 +32,7 @@ function slugify(s: string) {
 }
 
 function Page() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user, isCenterOwner, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
