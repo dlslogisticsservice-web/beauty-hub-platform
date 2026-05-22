@@ -60,6 +60,10 @@ export type Database = {
           customer_id: string
           id: string
           notes: string | null
+          payment_method: string | null
+          payment_ref: string | null
+          payment_status: string
+          paymob_order_id: number | null
           price_paid: number
           scheduled_at: string
           service_id: string
@@ -74,6 +78,10 @@ export type Database = {
           customer_id: string
           id?: string
           notes?: string | null
+          payment_method?: string | null
+          payment_ref?: string | null
+          payment_status?: string
+          paymob_order_id?: number | null
           price_paid?: number
           scheduled_at: string
           service_id: string
@@ -88,6 +96,10 @@ export type Database = {
           customer_id?: string
           id?: string
           notes?: string | null
+          payment_method?: string | null
+          payment_ref?: string | null
+          payment_status?: string
+          paymob_order_id?: number | null
           price_paid?: number
           scheduled_at?: string
           service_id?: string
@@ -244,6 +256,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications_log: {
+        Row: {
+          booking_id: string | null
+          channel: string
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json | null
+          recipient: string | null
+          status: string
+          template: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          channel: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json | null
+          recipient?: string | null
+          status?: string
+          template: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          channel?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json | null
+          recipient?: string | null
+          status?: string
+          template?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -255,6 +306,7 @@ export type Database = {
           id: string
           phone: string | null
           updated_at: string
+          whatsapp_opt_in: boolean
         }
         Insert: {
           avatar_url?: string | null
@@ -266,6 +318,7 @@ export type Database = {
           id: string
           phone?: string | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
         }
         Update: {
           avatar_url?: string | null
@@ -277,6 +330,7 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
         }
         Relationships: []
       }
