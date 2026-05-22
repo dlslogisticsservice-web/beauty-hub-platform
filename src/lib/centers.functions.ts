@@ -13,19 +13,26 @@ export const listCenters = createServerFn({ method: "GET" })
         country: z.enum(["EG", "SA"]).optional(),
         category: z.string().optional(),
         search: z.string().optional(),
+        sort: z.enum(["rating", "newest", "price"]).optional(),
         limit: z.number().min(1).max(60).optional(),
       })
       .parse(input ?? {}),
   )
   .handler(async ({ data }) => {
     let q = supabaseAdmin.from("centers").select(CENTER_COLS).eq("is_active", true);
-    if (data.city) q = q.ilike("city", `%${data.city}%`);
+    if (data.city) q = q.eq("city", data.city);
     if (data.country) q = q.eq("country", data.country);
     if (data.search) q = q.or(`name.ilike.%${data.search}%,name_ar.ilike.%${data.search}%`);
 
-    // Plan priority via subscription_plans table join not in postgrest easily;
-    // approximate: order premium > pro > basic > free by string desc, then rating
-    q = q.order("subscription_plan", { ascending: false }).order("rating_avg", { ascending: false }).limit(data.limit ?? 24);
+    const sort = data.sort ?? "rating";
+    // Always keep premium plans surfaced first
+    q = q.order("subscription_plan", { ascending: false });
+    if (sort === "rating") {
+      q = q.order("rating_avg", { ascending: false }).order("rating_count", { ascending: false });
+    } else if (sort === "newest") {
+      q = q.order("created_at", { ascending: false });
+    }
+    q = q.limit(data.limit ?? 24);
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);

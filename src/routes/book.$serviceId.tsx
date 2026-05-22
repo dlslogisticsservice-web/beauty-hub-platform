@@ -15,6 +15,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
 import { formatPrice } from "@/lib/currency";
+import { cityLabel } from "@/data/cities";
 
 export const Route = createFileRoute("/book/$serviceId")({
   head: () => ({ meta: [{ title: "Book a service — Beauty Hub" }] }),
@@ -116,7 +117,7 @@ function BookingPage() {
           {svc.service.name_ar && <p dir="rtl" className="text-primary text-display text-xl">{svc.service.name_ar}</p>}
           <div className="mt-5 space-y-2 text-sm">
             <p className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-4 w-4" /> {svc.center.name} {svc.center.city && `· ${svc.center.city}`}
+              <MapPin className="h-4 w-4" /> {svc.center.name} {svc.center.city && `· ${cityLabel(svc.center.city, locale)}`}
             </p>
             <p className="flex items-center gap-2 text-muted-foreground">
               <Clock className="h-4 w-4" /> {svc.service.duration_minutes} {t("common.minutes_full")}

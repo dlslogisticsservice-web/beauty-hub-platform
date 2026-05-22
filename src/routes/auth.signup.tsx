@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { getCitiesForCountry } from "@/data/cities";
 
 export const Route = createFileRoute("/auth/signup")({
   head: () => ({
@@ -19,15 +20,18 @@ export const Route = createFileRoute("/auth/signup")({
 });
 
 function SignupPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const [role, setRole] = useState<"customer" | "center_owner">("customer");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState<"EG" | "SA">("EG");
+  const [city, setCity] = useState<string>("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const cities = getCitiesForCountry(country);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +45,7 @@ function SignupPage() {
       },
     });
     if (!error && signed.user) {
-      await supabase.from("profiles").update({ country }).eq("id", signed.user.id);
+      await supabase.from("profiles").update({ country, city: city || null }).eq("id", signed.user.id);
     }
     setLoading(false);
     if (error) {
@@ -100,9 +104,18 @@ function SignupPage() {
           </div>
           <div>
             <Label htmlFor="country">{t("auth.country")}</Label>
-            <select id="country" value={country} onChange={(e) => setCountry(e.target.value as "EG" | "SA")} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+            <select id="country" value={country} onChange={(e) => { setCountry(e.target.value as "EG" | "SA"); setCity(""); }} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
               <option value="EG">🇪🇬 {t("common.country_eg")}</option>
               <option value="SA">🇸🇦 {t("common.country_sa")}</option>
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="city">{t("browse.city")}</Label>
+            <select id="city" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <option value="">{t("centers.filter_city")}</option>
+              {cities.map((c) => (
+                <option key={c.value} value={c.value}>{locale === "ar" ? c.label_ar : c.label_en}</option>
+              ))}
             </select>
           </div>
           <div>

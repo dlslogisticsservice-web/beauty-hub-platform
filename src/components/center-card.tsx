@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Star, BadgeCheck, Crown } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
+import { cityLabel } from "@/data/cities";
 
 export interface CenterCardData {
   id: string;
@@ -17,7 +18,7 @@ export interface CenterCardData {
 }
 
 export function CenterCard({ center }: { center: CenterCardData }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <Link
       to="/centers/$slug"
@@ -59,7 +60,7 @@ export function CenterCard({ center }: { center: CenterCardData }) {
         </div>
         {center.city && (
           <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" /> {center.city}
+            <MapPin className="h-3.5 w-3.5" /> {cityLabel(center.city, locale)}
           </p>
         )}
       </div>

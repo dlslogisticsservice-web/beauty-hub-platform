@@ -64,6 +64,7 @@
     "sort_rating": "Highest Rated",
     "sort_nearest": "Nearest",
     "sort_price": "Cheapest",
+    "sort_newest": "Newest",
     "empty": "No centers found"
   },
   "booking": {

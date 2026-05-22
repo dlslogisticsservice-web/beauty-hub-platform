@@ -11,6 +11,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { getCitiesForCountry } from "@/data/cities";
 
 export const Route = createFileRoute("/center/profile")({
   head: () => ({ meta: [{ title: "Center profile — Beauty Hub" }] }),
@@ -31,7 +32,7 @@ function slugify(s: string) {
 }
 
 function Page() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user, isCenterOwner, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -138,19 +139,24 @@ function Page() {
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
+              <Label>{t("auth.country")}</Label>
+              <select value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value as "EG" | "SA", city: "" })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                <option value="EG">🇪🇬 {t("common.country_eg")}</option>
+                <option value="SA">🇸🇦 {t("common.country_sa")}</option>
+              </select>
+            </div>
+            <div>
               <Label>{t("browse.city")}</Label>
-              <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} maxLength={80} />
+              <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                <option value="">{t("centers.filter_city")}</option>
+                {getCitiesForCountry(form.country).map((c) => (
+                  <option key={c.value} value={c.value}>{locale === "ar" ? c.label_ar : c.label_en}</option>
+                ))}
+              </select>
             </div>
             <div>
               <Label>{t("auth.phone")}</Label>
               <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} maxLength={30} />
-            </div>
-            <div>
-              <Label>{t("auth.country")}</Label>
-              <select value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value as "EG" | "SA" })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                <option value="EG">🇪🇬 {t("common.country_eg")}</option>
-                <option value="SA">🇸🇦 {t("common.country_sa")}</option>
-              </select>
             </div>
           </div>
           <div>
