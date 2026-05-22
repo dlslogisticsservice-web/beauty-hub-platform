@@ -6,6 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { getCenterBySlug } from "@/lib/centers.functions";
 import { formatPrice } from "@/lib/currency";
 import { useI18n } from "@/hooks/use-i18n";
+import { cityLabel } from "@/data/cities";
 
 const centerOpts = (slug: string) =>
   queryOptions({
