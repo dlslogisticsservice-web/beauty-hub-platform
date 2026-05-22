@@ -70,7 +70,7 @@ function LoginPage() {
           </Button>
         </form>
 
-        <DevCredentials />
+        
 
         <p className="mt-6 text-sm text-center text-muted-foreground">
           {t("auth.no_account")} <Link to="/auth/signup" className="text-primary hover:underline">{t("auth.sign_up")}</Link>
@@ -80,26 +80,3 @@ function LoginPage() {
   );
 }
 
-function DevCredentials() {
-  const [hidden, setHidden] = useState(() => typeof window !== "undefined" && sessionStorage.getItem("bh_dev_dismissed") === "1");
-  if (hidden) return null;
-  const dismiss = () => { sessionStorage.setItem("bh_dev_dismissed", "1"); setHidden(true); };
-  const rows = [
-    ["Super Admin", "superadmin@beautyhub.app", "SuperAdmin@2025"],
-    ["Admin", "admin@beautyhub.app", "Admin@2025"],
-    ["Center (EG)", "owner.eg@beautyhub.app", "Owner@2025"],
-    ["Center (SA)", "owner.sa@beautyhub.app", "Owner@2025"],
-    ["Customer", "customer1@beautyhub.app", "Customer@2025"],
-  ];
-  return (
-    <div className="mt-6 rounded-xl p-3 text-xs font-mono relative" style={{ background: "var(--black-mid)", border: "1px solid var(--gold)" }}>
-      <button onClick={dismiss} aria-label="Dismiss" className="absolute top-1.5 right-2 text-muted-foreground hover:text-primary">×</button>
-      <p className="text-[color:var(--gold)] mb-2">🔧 Development Accounts — Remove before production</p>
-      {rows.map(([label, em, pw]) => (
-        <div key={em} className="grid grid-cols-[110px_1fr_1fr] gap-2 text-muted-foreground">
-          <span>{label}</span><span>{em}</span><span>{pw}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
