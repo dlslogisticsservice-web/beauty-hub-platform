@@ -94,7 +94,7 @@ function CenterPage() {
                 )}
                 <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
                   {center.city && (
-                    <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {center.city}</span>
+                    <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {cityLabel(center.city, locale)}</span>
                   )}
                   {center.phone && (
                     <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {center.phone}</span>
