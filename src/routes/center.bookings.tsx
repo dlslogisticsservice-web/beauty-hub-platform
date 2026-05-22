@@ -105,7 +105,7 @@ function Page() {
                 <th className="px-4 py-3 font-medium">{t("common.scheduled_at")}</th>
                 <th className="px-4 py-3 font-medium">{t("common.status")}</th>
                 <th className="px-4 py-3 font-medium">{t("common.price")}</th>
-                <th className="px-4 py-3 font-medium">{t("admin.commissions")}</th>
+                <th className="px-4 py-3 font-medium">{t("center.net_payout")}</th>
                 <th className="px-4 py-3 font-medium text-right">{t("common.actions")}</th>
               </tr>
             </thead>
