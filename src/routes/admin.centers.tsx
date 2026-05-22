@@ -12,6 +12,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { getAdminCenters, updateCenterAdmin } from "@/lib/admin.functions";
+import { cityLabel } from "@/data/cities";
 
 export const Route = createFileRoute("/admin/centers")({
   head: () => ({ meta: [{ title: "Centers — Admin — Beauty Hub" }] }),
