@@ -42,8 +42,10 @@ export const getCenterDashboard = createServerFn({ method: "GET" })
       .gte("created_at", monthStart);
 
     const totalBookings = monthBookings?.length ?? 0;
-    const revenue = (monthBookings ?? []).filter((b) => b.status === "completed").reduce((s, b) => s + Number(b.price_paid), 0);
-    const commission = (monthBookings ?? []).filter((b) => b.status === "completed").reduce((s, b) => s + Number(b.commission_amount), 0);
+    const completed = (monthBookings ?? []).filter((b) => b.status === "completed");
+    const revenue = completed.reduce((s, b) => s + Number(b.price_paid), 0);
+    // Net payout = revenue minus internal commission. Commission itself is NOT returned to the client.
+    const payout = completed.reduce((s, b) => s + (Number(b.price_paid) - Number(b.commission_amount)), 0);
     const pending = (monthBookings ?? []).filter((b) => b.status === "pending").length;
 
     const { data: todays } = await supabaseAdmin
@@ -75,7 +77,7 @@ export const getCenterDashboard = createServerFn({ method: "GET" })
 
     return {
       center: { id: center.id, country: center.country },
-      stats: { totalBookings, revenue, commission, pending },
+      stats: { totalBookings, revenue, payout, pending },
       todaysBookings,
     };
   });
@@ -118,8 +120,17 @@ export const getCenterBookings = createServerFn({ method: "GET" })
     const pMap = new Map((profiles ?? []).map((p) => [p.id, p]));
     const sMap = new Map((services ?? []).map((s) => [s.id, s]));
 
+    // Sanitize: do not return commission_rate / commission_amount to center owners.
+    // Expose only payout (price_paid - commission_amount).
     let bookings = (rows ?? []).map((b) => ({
-      ...b,
+      id: b.id,
+      scheduled_at: b.scheduled_at,
+      status: b.status,
+      price_paid: b.price_paid,
+      payout: Number(b.price_paid) - Number(b.commission_amount),
+      customer_id: b.customer_id,
+      service_id: b.service_id,
+      created_at: b.created_at,
       customer_name: pMap.get(b.customer_id)?.full_name || pMap.get(b.customer_id)?.email || "Customer",
       service_name: sMap.get(b.service_id)?.name || "Service",
     }));

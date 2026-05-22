@@ -61,7 +61,7 @@ function Page() {
     return {
       count: list.length,
       revenue: list.reduce((s, b) => s + Number(b.price_paid), 0),
-      commission: list.reduce((s, b) => s + Number(b.commission_amount), 0),
+      payout: list.reduce((s, b) => s + Number(b.payout), 0),
     };
   }, [data]);
 
@@ -92,7 +92,7 @@ function Page() {
         <div className="mt-6 flex flex-wrap gap-6 rounded-2xl border border-border bg-card p-4 text-sm">
           <span><strong>{summary.count}</strong> {t("nav.bookings")}</span>
           <span>{t("admin.revenue")}: <strong className="text-primary">{formatPrice(summary.revenue, country, locale)}</strong></span>
-          <span>{t("admin.commissions")}: <strong>{formatPrice(summary.commission, country, locale)}</strong></span>
+          <span>{t("center.net_payout")}: <strong>{formatPrice(summary.payout, country, locale)}</strong></span>
         </div>
 
         <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
@@ -105,7 +105,7 @@ function Page() {
                 <th className="px-4 py-3 font-medium">{t("common.scheduled_at")}</th>
                 <th className="px-4 py-3 font-medium">{t("common.status")}</th>
                 <th className="px-4 py-3 font-medium">{t("common.price")}</th>
-                <th className="px-4 py-3 font-medium">{t("admin.commissions")}</th>
+                <th className="px-4 py-3 font-medium">{t("center.net_payout")}</th>
                 <th className="px-4 py-3 font-medium text-right">{t("common.actions")}</th>
               </tr>
             </thead>
@@ -122,7 +122,7 @@ function Page() {
                   <td className="px-4 py-3">{format(new Date(b.scheduled_at), "PP · p")}</td>
                   <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge></td>
                   <td className="px-4 py-3">{formatPrice(b.price_paid, country, locale)}</td>
-                  <td className="px-4 py-3">{formatPrice(b.commission_amount, country, locale)}</td>
+                  <td className="px-4 py-3">{formatPrice(b.payout, country, locale)}</td>
                   <td className="px-4 py-3 text-right whitespace-nowrap space-x-1.5">
                     {b.status === "pending" && <Button size="sm" variant="outline" onClick={() => update(b.id, "confirmed")}>{t("common.confirm")}</Button>}
                     {b.status === "confirmed" && <Button size="sm" variant="outline" onClick={() => update(b.id, "completed")}>{t("common.complete")}</Button>}
