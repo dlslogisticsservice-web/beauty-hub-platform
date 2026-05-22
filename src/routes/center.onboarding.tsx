@@ -28,7 +28,7 @@ const CATS = ["laser", "filler", "botox", "facial", "hair", "nails", "massage", 
 
 function Page() {
   const { user, loading } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [centerId, setCenterId] = useState<string | null>(null);
