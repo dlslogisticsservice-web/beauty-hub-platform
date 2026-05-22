@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Star, BadgeCheck, Crown } from "lucide-react";
 import { useI18n } from "@/hooks/use-i18n";
+import { cityLabel } from "@/data/cities";
 
 export interface CenterCardData {
   id: string;
