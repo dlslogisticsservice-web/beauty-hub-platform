@@ -42,8 +42,10 @@ export const getCenterDashboard = createServerFn({ method: "GET" })
       .gte("created_at", monthStart);
 
     const totalBookings = monthBookings?.length ?? 0;
-    const revenue = (monthBookings ?? []).filter((b) => b.status === "completed").reduce((s, b) => s + Number(b.price_paid), 0);
-    const commission = (monthBookings ?? []).filter((b) => b.status === "completed").reduce((s, b) => s + Number(b.commission_amount), 0);
+    const completed = (monthBookings ?? []).filter((b) => b.status === "completed");
+    const revenue = completed.reduce((s, b) => s + Number(b.price_paid), 0);
+    // Net payout = revenue minus internal commission. Commission itself is NOT returned to the client.
+    const payout = completed.reduce((s, b) => s + (Number(b.price_paid) - Number(b.commission_amount)), 0);
     const pending = (monthBookings ?? []).filter((b) => b.status === "pending").length;
 
     const { data: todays } = await supabaseAdmin
