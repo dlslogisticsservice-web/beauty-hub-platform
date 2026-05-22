@@ -104,9 +104,18 @@ function SignupPage() {
           </div>
           <div>
             <Label htmlFor="country">{t("auth.country")}</Label>
-            <select id="country" value={country} onChange={(e) => setCountry(e.target.value as "EG" | "SA")} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+            <select id="country" value={country} onChange={(e) => { setCountry(e.target.value as "EG" | "SA"); setCity(""); }} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
               <option value="EG">🇪🇬 {t("common.country_eg")}</option>
               <option value="SA">🇸🇦 {t("common.country_sa")}</option>
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="city">{t("browse.city")}</Label>
+            <select id="city" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <option value="">{t("centers.filter_city")}</option>
+              {cities.map((c) => (
+                <option key={c.value} value={c.value}>{locale === "ar" ? c.label_ar : c.label_en}</option>
+              ))}
             </select>
           </div>
           <div>
