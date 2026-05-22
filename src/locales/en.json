@@ -82,7 +82,22 @@
     "sign_in_hint": "You'll be asked to sign in.",
     "owner_cannot_book": "Center owners cannot book. Sign up as a customer.",
     "pick_required": "Please pick a date and time.",
-    "unavailable": "Service unavailable"
+    "unavailable": "Service unavailable",
+    "payment_step": "Choose payment method"
+  },
+  "payment": {
+    "title": "Payment method",
+    "card": "Credit / Debit Card",
+    "wallet": "Mobile Wallet",
+    "wallet_sub": "Vodafone Cash · Orange Money · Etisalat",
+    "cash": "Cash on Arrival",
+    "cash_sub": "Pay at the center",
+    "coming_soon": "Online payment coming soon — booked as cash for now.",
+    "processing": "Opening secure payment…",
+    "iframe_title": "Secure payment",
+    "close": "Close",
+    "paid": "Paid",
+    "unpaid": "Unpaid"
   },
   "dashboard": {
     "title": "My Bookings",

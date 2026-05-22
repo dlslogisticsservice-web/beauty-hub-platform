@@ -29,6 +29,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminCentersRouteImport } from './routes/admin.centers'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
+import { Route as ApiPublicPaymobWebhookRouteImport } from './routes/api/public/paymob-webhook'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -130,6 +131,11 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
   path: '/admin/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymobWebhookRoute = ApiPublicPaymobWebhookRouteImport.update({
+  id: '/api/public/paymob-webhook',
+  path: '/api/public/paymob-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/center/services': typeof CenterServicesRoute
   '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
+  '/api/public/paymob-webhook': typeof ApiPublicPaymobWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/center/services': typeof CenterServicesRoute
   '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
+  '/api/public/paymob-webhook': typeof ApiPublicPaymobWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/center/services': typeof CenterServicesRoute
   '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
+  '/api/public/paymob-webhook': typeof ApiPublicPaymobWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/center/services'
     | '/center/subscription'
     | '/centers/$slug'
+    | '/api/public/paymob-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/center/services'
     | '/center/subscription'
     | '/centers/$slug'
+    | '/api/public/paymob-webhook'
   id:
     | '__root__'
     | '/'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/center/services'
     | '/center/subscription'
     | '/centers/$slug'
+    | '/api/public/paymob-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   CenterProfileRoute: typeof CenterProfileRoute
   CenterServicesRoute: typeof CenterServicesRoute
   CenterSubscriptionRoute: typeof CenterSubscriptionRoute
+  ApiPublicPaymobWebhookRoute: typeof ApiPublicPaymobWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/paymob-webhook': {
+      id: '/api/public/paymob-webhook'
+      path: '/api/public/paymob-webhook'
+      fullPath: '/api/public/paymob-webhook'
+      preLoaderRoute: typeof ApiPublicPaymobWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -465,6 +485,7 @@ const rootRouteChildren: RootRouteChildren = {
   CenterProfileRoute: CenterProfileRoute,
   CenterServicesRoute: CenterServicesRoute,
   CenterSubscriptionRoute: CenterSubscriptionRoute,
+  ApiPublicPaymobWebhookRoute: ApiPublicPaymobWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
