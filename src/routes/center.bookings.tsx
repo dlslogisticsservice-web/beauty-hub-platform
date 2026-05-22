@@ -122,7 +122,7 @@ function Page() {
                   <td className="px-4 py-3">{format(new Date(b.scheduled_at), "PP · p")}</td>
                   <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge></td>
                   <td className="px-4 py-3">{formatPrice(b.price_paid, country, locale)}</td>
-                  <td className="px-4 py-3">{formatPrice(b.commission_amount, country, locale)}</td>
+                  <td className="px-4 py-3">{formatPrice(b.payout, country, locale)}</td>
                   <td className="px-4 py-3 text-right whitespace-nowrap space-x-1.5">
                     {b.status === "pending" && <Button size="sm" variant="outline" onClick={() => update(b.id, "confirmed")}>{t("common.confirm")}</Button>}
                     {b.status === "confirmed" && <Button size="sm" variant="outline" onClick={() => update(b.id, "completed")}>{t("common.complete")}</Button>}
