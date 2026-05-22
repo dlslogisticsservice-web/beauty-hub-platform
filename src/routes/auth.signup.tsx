@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { getCitiesForCountry } from "@/data/cities";
 
 export const Route = createFileRoute("/auth/signup")({
   head: () => ({
