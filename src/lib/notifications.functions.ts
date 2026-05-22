@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 // WhatsApp Cloud API template sender. No-op (logs only) until env vars are set
 // AND feature_flags.whatsapp_notifications = true.
