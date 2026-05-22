@@ -18,7 +18,7 @@ export interface CenterCardData {
 }
 
 export function CenterCard({ center }: { center: CenterCardData }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <Link
       to="/centers/$slug"
