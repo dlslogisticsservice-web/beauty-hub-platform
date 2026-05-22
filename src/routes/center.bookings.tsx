@@ -61,7 +61,7 @@ function Page() {
     return {
       count: list.length,
       revenue: list.reduce((s, b) => s + Number(b.price_paid), 0),
-      commission: list.reduce((s, b) => s + Number(b.commission_amount), 0),
+      payout: list.reduce((s, b) => s + Number(b.payout), 0),
     };
   }, [data]);
 
