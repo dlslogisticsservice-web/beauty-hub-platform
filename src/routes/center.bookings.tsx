@@ -92,7 +92,7 @@ function Page() {
         <div className="mt-6 flex flex-wrap gap-6 rounded-2xl border border-border bg-card p-4 text-sm">
           <span><strong>{summary.count}</strong> {t("nav.bookings")}</span>
           <span>{t("admin.revenue")}: <strong className="text-primary">{formatPrice(summary.revenue, country, locale)}</strong></span>
-          <span>{t("admin.commissions")}: <strong>{formatPrice(summary.commission, country, locale)}</strong></span>
+          <span>{t("center.net_payout")}: <strong>{formatPrice(summary.payout, country, locale)}</strong></span>
         </div>
 
         <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
