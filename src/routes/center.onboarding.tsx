@@ -13,6 +13,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { getCitiesForCountry } from "@/data/cities";
 
 export const Route = createFileRoute("/center/onboarding")({
   head: () => ({ meta: [{ title: "Onboarding — Beauty Hub" }] }),
