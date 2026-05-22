@@ -120,8 +120,17 @@ export const getCenterBookings = createServerFn({ method: "GET" })
     const pMap = new Map((profiles ?? []).map((p) => [p.id, p]));
     const sMap = new Map((services ?? []).map((s) => [s.id, s]));
 
+    // Sanitize: do not return commission_rate / commission_amount to center owners.
+    // Expose only payout (price_paid - commission_amount).
     let bookings = (rows ?? []).map((b) => ({
-      ...b,
+      id: b.id,
+      scheduled_at: b.scheduled_at,
+      status: b.status,
+      price_paid: b.price_paid,
+      payout: Number(b.price_paid) - Number(b.commission_amount),
+      customer_id: b.customer_id,
+      service_id: b.service_id,
+      created_at: b.created_at,
       customer_name: pMap.get(b.customer_id)?.full_name || pMap.get(b.customer_id)?.email || "Customer",
       service_name: sMap.get(b.service_id)?.name || "Service",
     }));
