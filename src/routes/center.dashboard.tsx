@@ -105,7 +105,7 @@ function Page() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={Calendar} label={t("center.bookings_this_month")} value={String(data.stats?.totalBookings ?? 0)} />
         <Stat icon={DollarSign} label={t("center.monthly_revenue")} value={formatPrice(data.stats?.revenue ?? 0, country, locale)} />
-        <Stat icon={Percent} label={t("center.commission_owed")} value={formatPrice(data.stats?.commission ?? 0, country, locale)} />
+        <Stat icon={Percent} label={t("center.net_payout")} value={formatPrice(data.stats?.payout ?? 0, country, locale)} />
         <Stat icon={Clock} label={t("center.pending_bookings")} value={String(data.stats?.pending ?? 0)} />
       </div>
 
