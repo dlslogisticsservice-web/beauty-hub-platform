@@ -77,7 +77,7 @@ export const getCenterDashboard = createServerFn({ method: "GET" })
 
     return {
       center: { id: center.id, country: center.country },
-      stats: { totalBookings, revenue, commission, pending },
+      stats: { totalBookings, revenue, payout, pending },
       todaysBookings,
     };
   });
