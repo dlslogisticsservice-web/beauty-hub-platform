@@ -15,6 +15,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
 import { formatPrice } from "@/lib/currency";
+import { cityLabel } from "@/data/cities";
 
 export const Route = createFileRoute("/book/$serviceId")({
   head: () => ({ meta: [{ title: "Book a service — Beauty Hub" }] }),
