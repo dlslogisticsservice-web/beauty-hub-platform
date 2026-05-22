@@ -49,8 +49,9 @@ function Page() {
   }, [loading, user, isSuperAdmin, navigate]);
 
   const { data } = useQuery({
-    queryKey: ["system-info"], enabled: !!user && isSuperAdmin,
+    queryKey: ["system-info"], enabled: !loading && !!user && isSuperAdmin,
     queryFn: () => getSystemInfo(),
+    retry: false,
   });
 
   const toggle = async (key: string, enabled: boolean) => {
