@@ -119,7 +119,7 @@ function Page() {
               <div><Label>Name (AR)</Label><Input dir="rtl" value={s1.name_ar} onChange={(e) => setS1({ ...s1, name_ar: e.target.value })} /></div>
               <div>
                 <Label>{t("auth.country")}</Label>
-                <Select value={s1.country} onValueChange={(v) => setS1({ ...s1, country: v })}>
+                <Select value={s1.country} onValueChange={(v) => setS1({ ...s1, country: v, city: "" })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="EG">🇪🇬 {t("common.country_eg")}</SelectItem>
@@ -127,7 +127,17 @@ function Page() {
                   </SelectContent>
                 </Select>
               </div>
-              <div><Label>{t("browse.city")}</Label><Input value={s1.city} onChange={(e) => setS1({ ...s1, city: e.target.value })} /></div>
+              <div>
+                <Label>{t("browse.city")}</Label>
+                <Select value={s1.city} onValueChange={(v) => setS1({ ...s1, city: v })}>
+                  <SelectTrigger><SelectValue placeholder={t("centers.filter_city")} /></SelectTrigger>
+                  <SelectContent>
+                    {getCitiesForCountry(s1.country as "EG" | "SA").map((c) => (
+                      <SelectItem key={c.value} value={c.value}>{locale === "ar" ? c.label_ar : c.label_en}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="sm:col-span-2"><Label>{t("auth.phone")}</Label><Input value={s1.phone} onChange={(e) => setS1({ ...s1, phone: e.target.value })} /></div>
               <div className="sm:col-span-2"><Label>Description (EN)</Label><Textarea value={s1.description} onChange={(e) => setS1({ ...s1, description: e.target.value })} rows={3} /></div>
               <div className="sm:col-span-2"><Label>Description (AR)</Label><Textarea dir="rtl" value={s1.description_ar} onChange={(e) => setS1({ ...s1, description_ar: e.target.value })} rows={3} /></div>
