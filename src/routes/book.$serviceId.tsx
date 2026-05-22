@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -17,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
 import { formatPrice } from "@/lib/currency";
 import { cityLabel } from "@/data/cities";
-import { initiatePaymobPayment, isPaymobConfigured } from "@/lib/paymob";
+import { initiatePaymobPaymentFn, isPaymobConfiguredFn } from "@/lib/paymob.functions";
 
 export const Route = createFileRoute("/book/$serviceId")({
   head: () => ({ meta: [{ title: "Book a service — Beauty Hub" }] }),
@@ -68,6 +69,13 @@ function BookingPage() {
     },
   });
 
+  const { data: paymobConfigured } = useQuery({
+    queryKey: ["paymob", "configured"],
+    queryFn: () => isPaymobConfiguredFn(),
+  });
+
+  const initiatePayment = useServerFn(initiatePaymobPaymentFn);
+
   const country = (svc?.center?.country ?? "EG") as "EG" | "SA";
   const currency: "EGP" | "SAR" = country === "SA" ? "SAR" : "EGP";
 
@@ -86,7 +94,7 @@ function BookingPage() {
     scheduled.setHours(hh, 0, 0, 0);
 
     const isOnline = payMethod === "card" || payMethod === "wallet";
-    const flagOn = paymentFlag && isPaymobConfigured();
+    const flagOn = Boolean(paymentFlag && paymobConfigured?.configured);
     const finalMethod: PayMethod = isOnline && !flagOn ? "cash" : payMethod;
     if (isOnline && !flagOn) toast.message(t("payment.coming_soon"));
 
@@ -100,7 +108,7 @@ function BookingPage() {
         scheduled_at: scheduled.toISOString(),
         status: "pending",
         price_paid: svc.service.price,
-        commission_rate: svc.center.commission_rate,
+        // commission_rate intentionally omitted — enforced server-side via DB trigger.
         notes: notes || null,
         payment_method: finalMethod,
         payment_status: finalMethod === "cash" ? "cash" : "unpaid",
@@ -121,25 +129,20 @@ function BookingPage() {
       return;
     }
 
-    // Online payment: initiate Paymob
+    // Online payment: initiate Paymob via server function (keys never leave the server).
     try {
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("full_name, email, phone")
-        .eq("id", user.id)
-        .maybeSingle();
-      const { iframeUrl, orderId } = await initiatePaymobPayment({
-        amountCents: Math.round(Number(svc.service.price) * 100),
-        currency,
-        country,
-        paymentMethod: finalMethod as "card" | "wallet",
-        customerName: prof?.full_name || user.email || "Customer",
-        customerEmail: prof?.email || user.email || "noreply@beautyhub.app",
-        customerPhone: prof?.phone || "+200000000000",
-        bookingId: inserted.id,
+      const result = await initiatePayment({
+        data: {
+          bookingId: inserted.id,
+          paymentMethod: finalMethod as "card" | "wallet",
+        },
       });
-      await supabase.from("bookings").update({ paymob_order_id: orderId }).eq("id", inserted.id);
-      setIframeUrl(iframeUrl);
+      if (!result.ok) {
+        toast.error(t("payment.coming_soon"));
+        navigate({ to: "/dashboard" });
+        return;
+      }
+      setIframeUrl(result.iframeUrl);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
