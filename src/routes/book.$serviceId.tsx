@@ -69,6 +69,13 @@ function BookingPage() {
     },
   });
 
+  const { data: paymobConfigured } = useQuery({
+    queryKey: ["paymob", "configured"],
+    queryFn: () => isPaymobConfiguredFn(),
+  });
+
+  const initiatePayment = useServerFn(initiatePaymobPaymentFn);
+
   const country = (svc?.center?.country ?? "EG") as "EG" | "SA";
   const currency: "EGP" | "SAR" = country === "SA" ? "SAR" : "EGP";
 
