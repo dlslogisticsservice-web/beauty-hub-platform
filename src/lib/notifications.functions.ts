@@ -133,14 +133,14 @@ export const sendBookingNotification = createServerFn({ method: "POST" })
       return { ok: true, queued: false };
     }
 
-    const { data: center } = await supabaseAdmin
+    const { data: centerInfo } = await supabaseAdmin
       .from("centers")
       .select("name, name_ar")
       .eq("id", booking.center_id)
       .maybeSingle();
 
     const when = new Date(booking.scheduled_at).toLocaleString("ar-EG");
-    const centerName = center?.name_ar || center?.name || "";
+    const centerName = centerInfo?.name_ar || centerInfo?.name || "";
 
     const result = await sendWhatsappTemplate({
       to: profile.phone,
