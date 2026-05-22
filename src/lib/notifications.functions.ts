@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 // WhatsApp Cloud API template sender. No-op (logs only) until env vars are set
 // AND feature_flags.whatsapp_notifications = true.
@@ -59,6 +60,7 @@ async function sendWhatsappTemplate(args: {
 }
 
 export const sendBookingNotification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -72,13 +74,32 @@ export const sendBookingNotification = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
     const { data: booking } = await supabaseAdmin
       .from("bookings")
       .select("id, customer_id, center_id, scheduled_at, service_id")
       .eq("id", data.bookingId)
       .maybeSingle();
     if (!booking) return { ok: false, error: "booking_not_found" };
+
+    // Authorization: only the booking's customer, the center owner, or an admin
+    // may trigger a notification for this booking.
+    const [{ data: roleRows }, { data: center }] = await Promise.all([
+      supabaseAdmin.from("user_roles").select("role").eq("user_id", userId),
+      supabaseAdmin
+        .from("centers")
+        .select("owner_id")
+        .eq("id", booking.center_id)
+        .maybeSingle(),
+    ]);
+    const roles = (roleRows ?? []).map((r) => r.role);
+    const isAdmin = roles.includes("admin") || roles.includes("super_admin");
+    const isOwner = center?.owner_id === userId;
+    const isCustomer = booking.customer_id === userId;
+    if (!isAdmin && !isOwner && !isCustomer) {
+      return { ok: false, error: "forbidden" };
+    }
 
     const { data: profile } = await supabaseAdmin
       .from("profiles")
@@ -112,14 +133,14 @@ export const sendBookingNotification = createServerFn({ method: "POST" })
       return { ok: true, queued: false };
     }
 
-    const { data: center } = await supabaseAdmin
+    const { data: centerInfo } = await supabaseAdmin
       .from("centers")
       .select("name, name_ar")
       .eq("id", booking.center_id)
       .maybeSingle();
 
     const when = new Date(booking.scheduled_at).toLocaleString("ar-EG");
-    const centerName = center?.name_ar || center?.name || "";
+    const centerName = centerInfo?.name_ar || centerInfo?.name || "";
 
     const result = await sendWhatsappTemplate({
       to: profile.phone,
