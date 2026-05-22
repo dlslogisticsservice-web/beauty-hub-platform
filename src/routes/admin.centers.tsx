@@ -113,7 +113,7 @@ function Page() {
                 <tr key={c.id} className="border-t border-border">
                   <td className="px-4 py-3 font-medium">{c.name}</td>
                   <td className="px-4 py-3 text-muted-foreground">{c.owner_email}</td>
-                  <td className="px-4 py-3">{c.city ?? "—"}</td>
+                  <td className="px-4 py-3">{c.city ? cityLabel(c.city, locale) : "—"}</td>
                   <td className="px-4 py-3"><Badge variant="secondary" className="capitalize">{c.subscription_plan}</Badge></td>
                   <td className="px-4 py-3">
                     {editingCommission === c.id ? (
