@@ -10,8 +10,8 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   build: {
-    outDir: "dist/client",
-  },
+  outDir: "dist",
+},
   server: {
     host: "0.0.0.0",
     allowedHosts: [
