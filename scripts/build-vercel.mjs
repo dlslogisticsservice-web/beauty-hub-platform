@@ -6,14 +6,23 @@ rmSync(".vercel/output", { recursive: true, force: true });
 mkdirSync(".vercel/output/static", { recursive: true });
 cpSync("dist/client", ".vercel/output/static", { recursive: true });
 
-// SSR Edge Function — dist/server exports default { fetch(req,env,ctx) }
+// SSR Node.js Serverless Function — wraps dist/server's CF Worker export
+// Edge runtime was rejected: it blocks node:crypto, react SSR, h3-v2, tanstack SSR modules.
+// Node.js runtime has no such restrictions.
 const funcDir = ".vercel/output/functions/index.func";
 mkdirSync(funcDir, { recursive: true });
 cpSync("dist/server", funcDir, { recursive: true });
 
+// Vercel Node.js runtime expects a function export, not CF Worker object { fetch }.
+// This adapter bridges the two formats.
+writeFileSync(
+  `${funcDir}/index.mjs`,
+  `import worker from "./server.js";\nexport default async function handler(request) {\n  return worker.fetch(request, {}, { waitUntil: () => {}, passThroughOnException: () => {} });\n}\n`
+);
+
 writeFileSync(
   `${funcDir}/.vc-config.json`,
-  JSON.stringify({ runtime: "edge", entrypoint: "server.js" })
+  JSON.stringify({ runtime: "nodejs20.x", handler: "index.mjs", maxDuration: 30 })
 );
 
 // Routing: serve static files first, then fall through to SSR function
