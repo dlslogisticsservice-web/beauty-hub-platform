@@ -96,7 +96,7 @@ function Page() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.centers.map((c) => (
+                  {data?.centers?.map((c) => (
                     <tr key={c.id} className="border-t border-border hover:bg-secondary/30 cursor-pointer" onClick={() => setOpenCenter({ id: c.id, name: c.name })}>
                       <td className="px-4 py-3 font-medium">{c.name}</td>
                       <td className="px-4 py-3">{c.country === "SA" ? "🇸🇦" : "🇪🇬"}</td>

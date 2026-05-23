@@ -133,15 +133,15 @@ function BrowsePage() {
           </select>
         </div>
 
-        <p className="mt-6 text-sm text-muted-foreground">{data.centers.length} {t("browse.found")}</p>
+        <p className="mt-6 text-sm text-muted-foreground">{data?.centers?.length ?? 0} {t("browse.found")}</p>
 
-        {data.centers.length === 0 ? (
+        {data?.centers?.length ?? 0 === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-16 text-center">
             <p className="text-display text-2xl text-muted-foreground">{t("centers.empty")}</p>
           </div>
         ) : (
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {data.centers.map((c) => <CenterCard key={c.id} center={c} />)}
+            {data?.centers.map((c) => <CenterCard key={c.id} center={c} />)}
           </div>
         )}
       </div>

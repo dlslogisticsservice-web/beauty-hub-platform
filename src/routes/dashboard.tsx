@@ -52,7 +52,15 @@ function CustomerDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, scheduled_at, status, price_paid, currency, service_id, center_id, services(name), centers(name, logo_url, slug, country), reviews(id)")
+        .select(`
+          id,
+          scheduled_at,
+          status,
+          price_paid,
+          currency,
+          service_id,
+          center_id
+        `)
         .eq("customer_id", user!.id)
         .order("scheduled_at", { ascending: false });
       if (error) throw error;

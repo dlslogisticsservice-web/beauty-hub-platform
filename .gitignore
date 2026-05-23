@@ -16,6 +16,16 @@ dist-ssr
 .nitro
 *.local
 
+# Environment secrets — never commit
+.env
+.env.local
+.env.production
+.env.staging
+.env.*.local
+
+# Supabase CLI temp files — contain project refs and connection URLs
+supabase/.temp/
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
