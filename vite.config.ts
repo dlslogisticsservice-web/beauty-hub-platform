@@ -19,8 +19,6 @@ export default defineConfig({
 
   preview: {
     host: "0.0.0.0",
-    allowedHosts: [
-      "beauty-hub-platform-production.up.railway.app",
-    ],
+    allowedHosts: true,
   },
 });
