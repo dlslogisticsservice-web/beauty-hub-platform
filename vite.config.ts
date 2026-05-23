@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
   ],
-  build: {
+ build: {
   outDir: "dist",
 },
   server: {
