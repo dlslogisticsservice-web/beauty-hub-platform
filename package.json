@@ -11,7 +11,7 @@
   "start": "node dist/server/index.js",
   "lint": "eslint .",
   "format": "prettier --write ."
-}
+},
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
     "@hookform/resolvers": "^5.2.2",
