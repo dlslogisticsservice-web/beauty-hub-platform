@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "wrangler dev --config wrangler.start.jsonc --ip 0.0.0.0 --port ${PORT:-3000} --log-level warn --show-interactive-dev-session=false",
+    "start": "vite preview --host 0.0.0.0 --port ${PORT:-3000}",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
