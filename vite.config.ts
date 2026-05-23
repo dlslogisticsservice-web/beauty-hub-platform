@@ -12,4 +12,16 @@ export default defineConfig({
   build: {
     outDir: "dist/client",
   },
+  server: {
+    host: "0.0.0.0",
+    allowedHosts: [
+      "beauty-hub-platform-production.up.railway.app",
+    ],
+  },
+  preview: {
+    host: "0.0.0.0",
+    allowedHosts: [
+      "beauty-hub-platform-production.up.railway.app",
+    ],
+  },
 });
