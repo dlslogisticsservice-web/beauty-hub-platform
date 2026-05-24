@@ -61,7 +61,10 @@ export const Route = createFileRoute("/api/public/paymob-webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const url = new URL(request.url);
+        const origin = process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : process.env.PUBLIC_URL ?? "http://localhost:3000";
+        const url = new URL(request.url || "/", origin);
         const hmac = url.searchParams.get("hmac") ?? "";
         const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
 

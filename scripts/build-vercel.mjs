@@ -22,14 +22,38 @@ mkdirSync(funcDir, { recursive: true });
 // all externalized npm deps — into a single self-contained index.mjs.
 // Node.js built-ins (node:*) remain external; they are always available.
 const tmpEntry = "dist/server/_vercel_entry.mjs";
+// Vercel's Node.js runtime may deliver the request with a path-only URL such
+// as "/" instead of "https://example.vercel.app/". h3/srvx calls new URL(req.url)
+// which requires an absolute URL — a relative one throws "Invalid URL".
+// We normalise at this adapter boundary so the rest of the stack never sees a
+// relative URL regardless of how Vercel constructs the Request object.
 writeFileSync(
   tmpEntry,
-  [
-    "import worker from './server.js';",
-    "export default async function handler(request) {",
-    "  return worker.fetch(request, {}, { waitUntil: () => {}, passThroughOnException: () => {} });",
-    "}",
-  ].join("\n")
+  `import worker from './server.js';
+
+function toAbsoluteUrl(request) {
+  try {
+    // Fast path: already absolute (most Vercel runtimes do this correctly).
+    new URL(request.url);
+    return request.url;
+  } catch {}
+  // Reconstruct from the request headers. Vercel always sets 'host'.
+  // x-forwarded-proto carries the external scheme even when the lambda
+  // itself is reached via http internally.
+  const host =
+    request.headers.get('x-forwarded-host') ||
+    request.headers.get('host') ||
+    (process.env.VERCEL_URL ?? 'localhost:3000');
+  const proto = request.headers.get('x-forwarded-proto') || 'https';
+  return new URL(request.url || '/', \`\${proto}://\${host}\`).href;
+}
+
+export default async function handler(request) {
+  const url = toAbsoluteUrl(request);
+  const req = url === request.url ? request : new Request(url, request);
+  return worker.fetch(req, {}, { waitUntil: () => {}, passThroughOnException: () => {} });
+}
+`
 );
 
 // Node.js built-in modules without the "node:" prefix are aliased so esbuild
