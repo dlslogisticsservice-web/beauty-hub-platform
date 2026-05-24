@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { cpSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { build } from "esbuild";
 
 rmSync(".vercel/output", { recursive: true, force: true });
@@ -27,19 +27,21 @@ const tmpEntry = "dist/server/_vercel_entry.mjs";
 // which requires an absolute URL — a relative one throws "Invalid URL".
 // We normalise at this adapter boundary so the rest of the stack never sees a
 // relative URL regardless of how Vercel constructs the Request object.
+//
+// We also attach a 27 s AbortSignal to the request so that if React's
+// renderToReadableStream or any upstream await never resolves, the signal fires
+// and worker.fetch rejects well before Vercel's 30 s hard Lambda timeout.
+// The errorMiddleware in src/start.ts catches the AbortError and returns a
+// 500 HTML response, so Vercel always receives a completed Response object.
 writeFileSync(
   tmpEntry,
   `import worker from './server.js';
 
 function toAbsoluteUrl(request) {
   try {
-    // Fast path: already absolute (most Vercel runtimes do this correctly).
     new URL(request.url);
     return request.url;
   } catch {}
-  // Reconstruct from the request headers. Vercel always sets 'host'.
-  // x-forwarded-proto carries the external scheme even when the lambda
-  // itself is reached via http internally.
   const host =
     request.headers.get('x-forwarded-host') ||
     request.headers.get('host') ||
@@ -49,9 +51,43 @@ function toAbsoluteUrl(request) {
 }
 
 export default async function handler(request) {
+  const t0 = Date.now();
+  console.log('[SSR] handler start', request.method, request.url);
+
   const url = toAbsoluteUrl(request);
-  const req = url === request.url ? request : new Request(url, request);
-  return worker.fetch(req, {}, { waitUntil: () => {}, passThroughOnException: () => {} });
+  const reqWithAbsUrl = url === request.url ? request : new Request(url, request);
+
+  // 27 s abort so renderToReadableStream is cancelled before Vercel's 30 s limit.
+  const abort = new AbortController();
+  const abortTimer = setTimeout(() => {
+    console.log('[SSR] 27 s abort fired — cancelling request');
+    abort.abort('SSR timeout: render did not complete within 27 s');
+  }, 27000);
+
+  // Merge the original signal (if any) with our 27 s budget.
+  if (reqWithAbsUrl.signal?.aborted) {
+    clearTimeout(abortTimer);
+    abort.abort(reqWithAbsUrl.signal.reason);
+  } else {
+    reqWithAbsUrl.signal?.addEventListener('abort', () => {
+      clearTimeout(abortTimer);
+      abort.abort(reqWithAbsUrl.signal.reason);
+    }, { once: true });
+  }
+
+  const hasBody = reqWithAbsUrl.method !== 'GET' && reqWithAbsUrl.method !== 'HEAD' && reqWithAbsUrl.body != null;
+  const reqInit = { method: reqWithAbsUrl.method, headers: reqWithAbsUrl.headers, signal: abort.signal };
+  if (hasBody) { reqInit.body = reqWithAbsUrl.body; reqInit.duplex = 'half'; }
+  const req = new Request(reqWithAbsUrl.url, reqInit);
+
+  try {
+    console.log('[SSR] calling worker.fetch');
+    const response = await worker.fetch(req, {}, { waitUntil: () => {}, passThroughOnException: () => {} });
+    console.log('[SSR] worker.fetch resolved in', Date.now() - t0, 'ms, status', response.status);
+    return response;
+  } finally {
+    clearTimeout(abortTimer);
+  }
 }
 `
 );
@@ -100,9 +136,57 @@ try {
   rmSync(tmpEntry, { force: true });
 }
 
+// ─── Post-build bundle patches ────────────────────────────────────────────────
+// transformStreamWithRouter has two 60 s safety timeouts. Both exceed Vercel's
+// 30 s Lambda limit, so the stream errors (via safeError) only after Vercel has
+// already killed the function. Patch them to:
+//   • serialisation timeout: 20 s — fires if serialisation stalls after render
+//   • lifetime timeout: 25 s — absolute ceiling, gives 5 s before Vercel's limit
+// Also replace safeError() with safeClose() in both handlers: closing the stream
+// gracefully lets Vercel send whatever HTML was rendered rather than surfacing a
+// network error to the browser. React will hydrate from the partial HTML and
+// re-fetch any missing data client-side.
+const bundlePath = `${funcDir}/index.mjs`;
+let bundle = readFileSync(bundlePath, "utf-8");
+
+const patched1 = bundle.replace("var DEFAULT_SERIALIZATION_TIMEOUT_MS = 6e4;", "var DEFAULT_SERIALIZATION_TIMEOUT_MS = 20e3;");
+const patched2 = patched1.replace("var DEFAULT_LIFETIME_TIMEOUT_MS = 6e4;", "var DEFAULT_LIFETIME_TIMEOUT_MS = 25e3;");
+// Replace safeError() calls in both timeout handlers with safeClose().
+// We match the error-message strings to be surgical: only the two timeout
+// handlers use these exact messages, so the replacements are safe regardless
+// of surrounding whitespace or comment presence in the esbuild output.
+const patched3 = patched2.replace(
+  /safeError\(\s*(?:\/\*[^*]*\*\/)?\s*new Error\("Stream lifetime exceeded"\)\s*\)/g,
+  "safeClose()"
+);
+const patched4 = patched3.replace(
+  /safeError\(\s*(?:\/\*[^*]*\*\/)?\s*new Error\("Serialization timeout after app render finished"\)\s*\)/g,
+  "safeClose()"
+);
+
+if (patched1 === bundle)   console.warn("[build-vercel] WARNING: DEFAULT_SERIALIZATION_TIMEOUT_MS patch did not apply");
+if (patched2 === patched1) console.warn("[build-vercel] WARNING: DEFAULT_LIFETIME_TIMEOUT_MS patch did not apply");
+if (patched3 === patched2) console.warn("[build-vercel] WARNING: safeError(Stream lifetime exceeded) patch did not apply");
+if (patched4 === patched3) console.warn("[build-vercel] WARNING: safeError(Serialization timeout) patch did not apply");
+
+bundle = patched4;
+
+writeFileSync(bundlePath, bundle);
+console.log("[build-vercel] Bundle timeout patches applied.");
+// ──────────────────────────────────────────────────────────────────────────────
+
+// supportsResponseStreaming: true is required for Vercel's Node.js Lambda
+// adapter to handle a ReadableStream response body. Without it the adapter
+// tries to buffer the entire response synchronously — which hangs if the
+// stream doesn't close immediately — and the function times out at 30 s.
 writeFileSync(
   `${funcDir}/.vc-config.json`,
-  JSON.stringify({ runtime: "nodejs20.x", handler: "index.mjs", maxDuration: 30 })
+  JSON.stringify({
+    runtime: "nodejs20.x",
+    handler: "index.mjs",
+    maxDuration: 30,
+    supportsResponseStreaming: true,
+  })
 );
 
 // Routing: CDN-served static files first, then all other requests to SSR function
