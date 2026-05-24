@@ -42,8 +42,12 @@ try {
       "--platform=node",
       "--format=esm",
       `--outfile=${funcDir}/index.mjs`,
-      "--alias:crypto=node:crypto", // bare 'crypto' → node:crypto built-in
+      "--alias:crypto=node:crypto",  // bare 'crypto' → node:crypto built-in
       "--external:node:*",           // keep node: built-ins as external
+      // esbuild wraps CJS modules with __require() which checks typeof require.
+      // Node 20 ESM does not expose require; Node 22+ does. Vercel runs Node 20,
+      // so we inject a createRequire polyfill before the bundle so __require works.
+      "--banner:js=import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);",
     ],
     { stdio: "inherit" }
   );
