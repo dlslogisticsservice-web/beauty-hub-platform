@@ -82,6 +82,12 @@ try {
     alias: builtinAlias,
     // Keep every node: built-in external (available in the Lambda runtime).
     external: ["node:*"],
+    // h3-v2, @tanstack/*, @supabase/* and local server chunks each declare
+    // "sideEffects": false in their own package.json files. The CF Workers
+    // server build emits bare `import "h3-v2"` calls for side-effect-only
+    // initialization. Without this flag esbuild honors those annotations and
+    // silently drops those imports, breaking SSR route and middleware setup.
+    ignoreAnnotations: true,
     // esbuild wraps bundled CJS modules with a __require() helper that checks
     // `typeof require !== "undefined"`. Node 20 ESM does not expose require,
     // so we inject it via createRequire once at the top of the output file.
