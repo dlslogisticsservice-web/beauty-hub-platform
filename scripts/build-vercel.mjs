@@ -37,16 +37,24 @@ writeFileSync(
   tmpEntry,
   `import worker from './server.js';
 
+// Works with both WHATWG Headers (.get()) and plain IncomingHttpHeaders objects.
+function getHeader(headers, name) {
+  if (!headers) return undefined;
+  if (typeof headers.get === 'function') return headers.get(name);
+  const value = headers[name.toLowerCase()] ?? headers[name];
+  return Array.isArray(value) ? value[0] : value;
+}
+
 function toAbsoluteUrl(request) {
   try {
     new URL(request.url);
     return request.url;
   } catch {}
   const host =
-    request.headers.get('x-forwarded-host') ||
-    request.headers.get('host') ||
-    (process.env.VERCEL_URL ?? 'localhost:3000');
-  const proto = request.headers.get('x-forwarded-proto') || 'https';
+    getHeader(request.headers, 'x-forwarded-host') ||
+    getHeader(request.headers, 'host') ||
+    'localhost:3000';
+  const proto = getHeader(request.headers, 'x-forwarded-proto') || 'https';
   return new URL(request.url || '/', \`\${proto}://\${host}\`).href;
 }
 
@@ -149,12 +157,14 @@ try {
 const bundlePath = `${funcDir}/index.mjs`;
 let bundle = readFileSync(bundlePath, "utf-8");
 
-const patched1 = bundle.replace("var DEFAULT_SERIALIZATION_TIMEOUT_MS = 6e4;", "var DEFAULT_SERIALIZATION_TIMEOUT_MS = 20e3;");
-const patched2 = patched1.replace("var DEFAULT_LIFETIME_TIMEOUT_MS = 6e4;", "var DEFAULT_LIFETIME_TIMEOUT_MS = 25e3;");
-// Replace safeError() calls in both timeout handlers with safeClose().
-// We match the error-message strings to be surgical: only the two timeout
-// handlers use these exact messages, so the replacements are safe regardless
-// of surrounding whitespace or comment presence in the esbuild output.
+// esbuild splits `var X = value;` into a hoisted `var X;` declaration and an
+// `X = value;` assignment inside the __esm IIFE — so the patterns must match
+// the assignment form (indented, no `var` prefix).
+const patched1 = bundle.replace("  DEFAULT_SERIALIZATION_TIMEOUT_MS = 6e4;", "  DEFAULT_SERIALIZATION_TIMEOUT_MS = 20e3;");
+const patched2 = patched1.replace("  DEFAULT_LIFETIME_TIMEOUT_MS = 6e4;", "  DEFAULT_LIFETIME_TIMEOUT_MS = 25e3;");
+// Replace safeError() / safeError2() calls in all timeout handlers with
+// safeClose() / safeClose2(). esbuild renames the second occurrence to safeError2
+// (fast path) to avoid a name collision with the first (slow path).
 const patched3 = patched2.replace(
   /safeError\(\s*(?:\/\*[^*]*\*\/)?\s*new Error\("Stream lifetime exceeded"\)\s*\)/g,
   "safeClose()"
@@ -163,13 +173,18 @@ const patched4 = patched3.replace(
   /safeError\(\s*(?:\/\*[^*]*\*\/)?\s*new Error\("Serialization timeout after app render finished"\)\s*\)/g,
   "safeClose()"
 );
+const patched5 = patched4.replace(
+  /safeError2\(\s*(?:\/\*[^*]*\*\/)?\s*new Error\("Stream lifetime exceeded"\)\s*\)/g,
+  "safeClose2()"
+);
 
 if (patched1 === bundle)   console.warn("[build-vercel] WARNING: DEFAULT_SERIALIZATION_TIMEOUT_MS patch did not apply");
 if (patched2 === patched1) console.warn("[build-vercel] WARNING: DEFAULT_LIFETIME_TIMEOUT_MS patch did not apply");
 if (patched3 === patched2) console.warn("[build-vercel] WARNING: safeError(Stream lifetime exceeded) patch did not apply");
 if (patched4 === patched3) console.warn("[build-vercel] WARNING: safeError(Serialization timeout) patch did not apply");
+if (patched5 === patched4) console.warn("[build-vercel] WARNING: safeError2(Stream lifetime exceeded) patch did not apply");
 
-bundle = patched4;
+bundle = patched5;
 
 writeFileSync(bundlePath, bundle);
 console.log("[build-vercel] Bundle timeout patches applied.");
