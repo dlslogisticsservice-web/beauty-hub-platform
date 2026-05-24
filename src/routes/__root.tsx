@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -11,7 +10,6 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { I18nProvider } from "@/hooks/use-i18n";
 
 function NotFoundComponent() {
@@ -19,12 +17,20 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl text-display text-primary">404</h1>
-        <h2 className="mt-4 text-xl font-semibold">Page not found</h2>
+
+        <h2 className="mt-4 text-xl font-semibold">
+          Page not found
+        </h2>
+
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist.
         </p>
+
         <div className="mt-6">
-          <Link to="/" className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
             Go home
           </Link>
         </div>
@@ -33,16 +39,33 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   console.error(error);
+
   const router = useRouter();
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold">Something went wrong</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+        <h1 className="text-xl font-semibold">
+          Something went wrong
+        </h1>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          {error.message}
+        </p>
+
         <button
-          onClick={() => { router.invalidate(); reset(); }}
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
           className="mt-6 rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
           Try again
@@ -52,46 +75,97 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0a0a0a" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "Beauty Hub" },
-      { title: "Beauty Hub — Book Beauty, Laser & Wellness Clinics" },
-      { name: "description", content: "Beauty Hub (بيوتي هب) — your gateway to beauty, laser & wellness across Egypt and Saudi Arabia." },
-      { property: "og:title", content: "Beauty Hub — Book Beauty, Laser & Wellness Clinics" },
-      { property: "og:description", content: "Beauty Hub (بيوتي هب) — your gateway to beauty, laser & wellness across Egypt and Saudi Arabia." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Beauty Hub — Book Beauty, Laser & Wellness Clinics" },
-      { name: "twitter:description", content: "Beauty Hub (بيوتي هب) — your gateway to beauty, laser & wellness across Egypt and Saudi Arabia." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1cbf0f68-54ce-40aa-8178-d787060f28ff" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1cbf0f68-54ce-40aa-8178-d787060f28ff" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+export const Route =
+  createRootRouteWithContext<{
+    queryClient: QueryClient;
+  }>()({
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
 
-function RootShell({ children }: { children: React.ReactNode }) {
+        {
+          name: "viewport",
+          content:
+            "width=device-width, initial-scale=1, viewport-fit=cover",
+        },
+
+        {
+          name: "theme-color",
+          content: "#0a0a0a",
+        },
+
+        {
+          title:
+            "Beauty Hub — Book Beauty, Laser & Wellness Clinics",
+        },
+
+        {
+          name: "description",
+          content:
+            "Beauty Hub (بيوتي هب) — your gateway to beauty, laser & wellness across Egypt and Saudi Arabia.",
+        },
+      ],
+
+      links: [
+        {
+          rel: "stylesheet",
+          href: appCss,
+        },
+
+        {
+          rel: "manifest",
+          href: "/manifest.webmanifest",
+        },
+
+        {
+          rel: "icon",
+          href: "/icon-192.png",
+          type: "image/png",
+          sizes: "192x192",
+        },
+
+        {
+          rel: "apple-touch-icon",
+          href: "/apple-touch-icon.png",
+          sizes: "180x180",
+        },
+
+        {
+          rel: "preconnect",
+          href: "https://fonts.googleapis.com",
+        },
+
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossOrigin: "",
+        },
+
+        {
+          rel: "stylesheet",
+          href:
+            "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap",
+        },
+      ],
+    }),
+
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  });
+
+function RootShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+      </head>
+
       <body>
         {children}
         <Scripts />
@@ -100,27 +174,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AuthListener() {
-  const router = useRouter();
-  const qc = useQueryClient();
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
-      qc.invalidateQueries();
-    });
-    return () => subscription.unsubscribe();
-  }, [router, qc]);
-  return null;
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <AuthListener />
         <Outlet />
-        <Toaster position="top-center" richColors />
+
+        <Toaster
+          position="top-center"
+          richColors
+        />
       </I18nProvider>
     </QueryClientProvider>
   );
