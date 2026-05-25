@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -74,7 +73,7 @@ function BookingPage() {
     queryFn: () => isPaymobConfiguredFn(),
   });
 
-  const initiatePayment = useServerFn(initiatePaymobPaymentFn);
+  const initiatePayment = initiatePaymobPaymentFn;
 
   const country = (svc?.center?.country ?? "EG") as "EG" | "SA";
   const currency: "EGP" | "SAR" = country === "SA" ? "SAR" : "EGP";

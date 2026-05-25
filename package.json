@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && node scripts/build-vercel.mjs",
+    "build": "vite build",
     "preview": "vite preview",
     "start": "vite preview --host 0.0.0.0 --port $PORT",
     "lint": "eslint .",

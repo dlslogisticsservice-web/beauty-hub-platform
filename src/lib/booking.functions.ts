@@ -1,42 +1,28 @@
-import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+﻿import { supabase } from '@/integrations/supabase/client';
 
-export const getServiceForBooking = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ serviceId: z.string().uuid() }).parse(input))
-  .handler(async ({ data }) => {
-    const { data: service, error } = await supabaseAdmin
-      .from("services")
-      .select("id, name, name_ar, category, price, duration_minutes, center_id")
-      .eq("id", data.serviceId)
-      .eq("is_active", true)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!service) return { service: null, center: null };
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
 
-    const { data: center } = await supabaseAdmin
-      .from("centers")
-      .select("id, name, name_ar, slug, logo_url, city, country, commission_rate")
-      .eq("id", service.center_id)
-      .maybeSingle();
+async function get(path: string, params?: Record<string, string | undefined>) {
+  const headers = await authHeaders();
+  const qs = params ? new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([, v]) => v != null) as [string, string][])).toString() : '';
+  const url = qs ? `${path}?${qs}` : path;
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error(await res.text().catch(() => res.statusText));
+  return res.json();
+}
 
-    return { service, center };
-  });
+async function post(path: string, data: unknown) {
+  const headers = await authHeaders();
+  const res = await fetch(path, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+  if (!res.ok) throw new Error(await res.text().catch(() => res.statusText));
+  return res.json();
+}
 
-export const getBookedSlots = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    z.object({ serviceId: z.string().uuid(), date: z.string() }).parse(input),
-  )
-  .handler(async ({ data }) => {
-    const start = new Date(`${data.date}T00:00:00Z`).toISOString();
-    const end = new Date(`${data.date}T23:59:59Z`).toISOString();
-    const { data: rows, error } = await supabaseAdmin
-      .from("bookings")
-      .select("scheduled_at")
-      .eq("service_id", data.serviceId)
-      .neq("status", "cancelled")
-      .gte("scheduled_at", start)
-      .lte("scheduled_at", end);
-    if (error) throw new Error(error.message);
-    return { slots: (rows ?? []).map((r) => r.scheduled_at) };
-  });
+export const getServiceForBooking = ({ data }: { data: { serviceId: string } }) =>
+  get('/api/fn/booking-service', { serviceId: data.serviceId });
+
+export const getBookedSlots = ({ data }: { data: { serviceId: string; date: string } }) =>
+  get('/api/fn/booking-slots', { serviceId: data.serviceId, date: data.date });
