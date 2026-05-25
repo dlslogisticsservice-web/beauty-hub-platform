@@ -1,5 +1,18 @@
 import { createHmac, timingSafeEqual } from 'crypto';
-import { supabaseAdmin } from '../_supabase';
+import { createClient } from '@supabase/supabase-js';
+
+function makeAdmin() {
+  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+let _admin: ReturnType<typeof makeAdmin> | undefined;
+const supabaseAdmin = new Proxy({} as ReturnType<typeof makeAdmin>, {
+  get(_, prop, receiver) {
+    if (!_admin) _admin = makeAdmin();
+    return Reflect.get(_admin, prop, receiver);
+  },
+});
 
 const HMAC_FIELDS = ['amount_cents','created_at','currency','error_occured','has_parent_transaction','id','integration_id','is_3d_secure','is_auth','is_capture','is_refunded','is_standalone_payment','is_voided','order.id','owner','pending','source_data.pan','source_data.sub_type','source_data.type','success'];
 
