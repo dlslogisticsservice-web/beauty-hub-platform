@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CentersRouteImport } from './routes/centers'
+import { Route as AiConsultantRouteImport } from './routes/ai-consultant'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
 import { Route as CenterSubscriptionRouteImport } from './routes/center.subscription'
@@ -37,6 +38,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const CentersRoute = CentersRouteImport.update({
   id: '/centers',
   path: '/centers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiConsultantRoute = AiConsultantRouteImport.update({
+  id: '/ai-consultant',
+  path: '/ai-consultant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -127,6 +133,7 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-consultant': typeof AiConsultantRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-consultant': typeof AiConsultantRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -170,6 +178,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-consultant': typeof AiConsultantRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-consultant'
     | '/centers'
     | '/dashboard'
     | '/admin/bookings'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-consultant'
     | '/centers'
     | '/dashboard'
     | '/admin/bookings'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai-consultant'
     | '/centers'
     | '/dashboard'
     | '/admin/bookings'
@@ -257,6 +269,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiConsultantRoute: typeof AiConsultantRoute
   CentersRoute: typeof CentersRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/centers'
       fullPath: '/centers'
       preLoaderRoute: typeof CentersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-consultant': {
+      id: '/ai-consultant'
+      path: '/ai-consultant'
+      fullPath: '/ai-consultant'
+      preLoaderRoute: typeof AiConsultantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -427,6 +447,7 @@ const CentersRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiConsultantRoute: AiConsultantRoute,
   CentersRoute: CentersRouteWithChildren,
   DashboardRoute: DashboardRoute,
   AdminBookingsRoute: AdminBookingsRoute,

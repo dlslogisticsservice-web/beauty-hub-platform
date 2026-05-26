@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { CenterCard } from "@/components/center-card";
+import { PromoCarousel } from "@/components/promo-carousel";
 
 import { listCenters } from "@/lib/centers.functions";
 import { useI18n } from "@/hooks/use-i18n";
@@ -230,6 +231,35 @@ function HomePage() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Promo carousel + AI consultant teaser */}
+      <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <PromoCarousel />
+          </div>
+
+          <Link
+            to="/ai-consultant"
+            className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 hover:border-primary transition group"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 text-display text-2xl group-hover:text-primary transition">
+                {t("ai_consultant.title")}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("ai_consultant.subtitle")}
+              </p>
+            </div>
+            <span className="mt-6 text-xs font-semibold text-primary">
+              {t("ai_consultant.start")} →
+            </span>
+          </Link>
         </div>
       </section>
 

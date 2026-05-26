@@ -56,6 +56,50 @@ async function ensureSuperAdmin(userId: string) {
   if (!(data ?? []).map((r: any) => r.role).includes('super_admin')) throw new Error('Forbidden');
 }
 
+// ── skin analysis (local fallback — no external API required) ────────────
+
+function fitzpatrickDangers(type: string): string {
+  const map: Record<string, string> = {
+    'Type I': 'بشرة فائقة الحساسية وخالية تماماً من الميلانين الطبيعي. خطر فوري للإصابة بحروق من الدرجة الأولى. يمنع التعرض للشمس قبل أو بعد الجلسة بدون حماية قصوى.',
+    'Type II': 'بشرة فاتحة جداً سريعة التهييج. خطر تطور وذمة حمامية مفرطة. يحظر تطبيق علاجات تقشير حمضية قوية بالتزامن مع الليزر.',
+    'Type III': 'بشرة متوسطة ومتقبلة لليزر بحذر. خطر معتدل لتطور تصبغات ما بعد الالتهاب (PIH). تجنب التعرض للحرارة الشديدة.',
+    'Type IV': 'تحذير: البشرة غنية بالميلانين (النوع الشرق أوسطي). خطر بالغ لفرط التصبغ الجلدي. يمنع استخدام ليزر الألكسندرايت بطاقات غير مضبوطة.',
+    'Type V': 'تحذير حرج: تركيزات مفرطة للميلانين. خطر مؤكد للتصبغات الطويلة الأمد إذا استخدمت أطوال موجات قصيرة. التبريد التلامسي المستمر إلزامي.',
+    'Type VI': 'خطر مطلق للاحتراق إذا لم تطبق بروتوكولات حماية فائقة. يمنع تماماً الليزر الكربوني الحراري المباشر أو IPL. أطوال موجية ممتصة عميقاً حصراً.',
+  };
+  return map[type] ?? 'تتطلب البشرة تقييماً دقيقاً لنشاط الخلايا الصبغية قبل أي نبضات ضوئية.';
+}
+
+function laserSettings(type: string) {
+  if (type === 'Type I' || type === 'Type II') return { device: 'Alexandrite (755nm) / GentleMax Pro®', suitability: 'مناسب جداً ومثالي لاستهداف لوني فائق الدقة.', fluence: '14 – 18 J/cm²', pulseDuration: '3 – 5 ms', cooling: 'تبريد ديناميكي غازي (DCD) 30ms بخاخ / 20ms تأخير.', reasoning: 'الطول الموجي القصير يمتصه الميلانين القليل بكفاءة عالية دون خطر.' };
+  if (type === 'Type III') return { device: 'Diode Laser (810nm) / Soprano Titanium', suitability: 'مناسب مع تعديل عرض النبضة لمنع تضرر الخلايا الميلانينية.', fluence: '12 – 15 J/cm²', pulseDuration: '10 – 15 ms', cooling: 'حماية جليدية تلامسية بنظام الياقوت الأزرق المزدوج.', reasoning: 'الطول الموجي المتوسط يحقق التوازن بين الفعالية والأمان لهذا النوع.' };
+  if (type === 'Type IV') return { device: 'Long-Pulse Nd:YAG (1064nm) / Cynosure Elite®', suitability: 'الخيار الطبي والآمن المطلق للبشرة الحنطية الشرق أوسطية.', fluence: '16 – 20 J/cm²', pulseDuration: '15 – 20 ms', cooling: 'تبريد هواء Zimmer مستمر بالمستوى 4 أو 5.', reasoning: 'الطول الموجي الطويل يتجاوز الميلانين السطحي ويستهدف جذر البصيلة مباشرة.' };
+  return { device: 'Long-Pulse Nd:YAG (1064nm) حصراً', suitability: 'الخيار الوحيد الآمن المعتمد عالمياً لهذا النوع.', fluence: '14 – 16 J/cm²', pulseDuration: '25 – 40 ms', cooling: 'نظام هواء مبرد ذكي مع تبريد تلامسي لمنع الصدمات الكربونية.', reasoning: 'النبضات الطويلة تمتص ببطء للتبريد الآمن مع الحفاظ على سطح الجلد.' };
+}
+
+function getSkinAnalysis(skinType: string, concerns: string | undefined, fitzpatrick: string) {
+  const laser = laserSettings(fitzpatrick);
+  return {
+    analysis: `بناءً على التقييم الدقيق، بشرتك من النوع (${skinType}) وتعاني من (${concerns || 'الحاجة للترميم والنضارة'}). يحتاج الحاجز الحامي للجلد تغذية مكثفة بجزيئات الهيدروكسيل لتقوية دعامة السيراميدات الطبيعية. الخلايا القرنية السطحية مستعدة لمستحضرات النضارة اللطيفة.`,
+    fitzpatrickDangers: fitzpatrickDangers(fitzpatrick),
+    laserSettings: { ...laser, reasoning: `تم تفعيل نظام الطاقة المبرمج خصيصاً للنوع الفيتزبارتيكي (${fitzpatrick}) للتوجيه الدقيق لأشعة ليزر بدون تراكم حراري.` },
+    treatmentSuggestions: [
+      'جلسة استعادة النضارة الفائقة هايدرافيشال لتوحيد ملمس الجلد.',
+      'التقشير البارد لإزالة البقع التعبيرية وفرط التصبغات برفق.',
+      'العلاج الضوئي اللطيف LED لتهدئة البشرة وتحفيز الإيلاستين الموضعي.',
+    ],
+    productRecommendations: [
+      'سيروم حمض الهيالورونيك الفاخر لاستعادة نضارة البشرة ومقاومة التجاعيد الدقيقة.',
+      'كريم الخلايا الجذعية المتطور لمحيط العين لتقليل الهالات والانتفاخ.',
+      'تونر النضارة بزلاقة البابونج مع واقي شمس خالٍ من المواد العطرية التخليقية.',
+    ],
+    skincareRoutine: {
+      morning: 'تطهير لطيف، تونر البابونج، سيروم الهيالورونيك، واقي الشمس.',
+      night: 'تنظيف مزدوج، مرطب غني بالسيراميدات، كريم الخلايا الجذعية لمحيط العين.',
+    },
+  };
+}
+
 // ── route handlers ────────────────────────────────────────────────────────
 
 const CENTER_COLS = 'id, name, name_ar, slug, description, description_ar, city, address, phone, logo_url, cover_url, subscription_plan, country, rating_avg, rating_count, is_verified';
@@ -433,6 +477,12 @@ const handlers: Record<string, (req: any, res: any) => Promise<void>> = {
     const { error } = await supabaseAdmin.from('feature_flags').update({ enabled }).eq('key', key);
     if (error) throw new Error(error.message);
     jsonOk(res, { ok: true });
+  },
+
+  'analyze-skin': async (req, res) => {
+    const { skinType, concerns, fitzpatrick } = req.body ?? {};
+    if (!skinType || !fitzpatrick) return res.status(400).json({ error: 'Missing skinType or fitzpatrick' });
+    jsonOk(res, getSkinAnalysis(skinType, concerns, fitzpatrick));
   },
 };
 
