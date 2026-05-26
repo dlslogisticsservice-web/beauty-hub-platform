@@ -319,6 +319,24 @@
     "concerns_multi": "Multi-select",
     "custom_concern": "Any additional concern (optional)"
   },
+  "image_upload": {
+    "title": "Smart Document & Image Upload",
+    "subtitle": "Supports drag-drop, instant compression and secure file management",
+    "diagnostic_skin": "Skin Diagnostics",
+    "doctor_certs": "Doctor Certs",
+    "facilities": "Facilities & Equipment",
+    "admin_banners": "Admin Banners",
+    "drag_drop": "Drag & drop a photo or document here, or click to browse",
+    "processing": "Compressing and securing file…",
+    "success": "File uploaded and compressed successfully!",
+    "size_before": "Original Size:",
+    "size_after": "Compressed Size (~60% saved):",
+    "preview": "Compressed File Preview:",
+    "gallery": "Uploaded Documents & Photos",
+    "empty": "No documents uploaded yet.",
+    "staging_ready": "STAGING READY",
+    "click_inspect": "Click to inspect quality"
+  },
   "plans": {
     "month": "/ month",
     "max_services": "services",
