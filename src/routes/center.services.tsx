@@ -17,6 +17,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
+import { PLAN_CATALOG, isWithinLimit } from "@/features/subscription";
+import type { PlanId } from "@/features/subscription";
 
 export const Route = createFileRoute("/center/services")({
   head: () => ({ meta: [{ title: "Services — Beauty Hub" }] }),
@@ -70,12 +72,12 @@ function Page() {
   const [deleting, setDeleting] = useState<Service | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const planLimits: Record<string, number> = { free: 5, basic: 20, pro: 1000, premium: 1000 };
-  const limit = planLimits[centerData?.subscription_plan ?? "free"] ?? 5;
+  const planId = (centerData?.subscription_plan ?? "free") as PlanId;
+  const limit = PLAN_CATALOG[planId]?.maxServices ?? 5;
 
   const open = (svc?: Service) => {
     if (!centerData) return;
-    if (!svc && (services?.length ?? 0) >= limit) {
+    if (!svc && !isWithinLimit(limit, services?.length ?? 0)) {
       toast.error(t("center.plan_limit_reached"));
       return;
     }
