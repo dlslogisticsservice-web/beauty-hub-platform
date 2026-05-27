@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -100,18 +101,17 @@ function Page() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <SiteHeader />
-        <div className="mx-auto max-w-3xl px-6 py-16 flex-1">{t("common.loading")}</div>
-        <SiteFooter />
-      </div>
+      <DashboardLayout role="center">
+        <div className="max-w-3xl mx-auto py-6">
+          <p className="text-muted-foreground">{t("common.loading")}</p>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="center">
+      <div className="max-w-3xl">
         <h1 className="text-display text-5xl">{form.id ? t("center.edit_profile") : t("center.create_center")}</h1>
 
         <div className="mt-8 space-y-5 rounded-3xl border border-border bg-card p-6 shadow-soft">
@@ -174,8 +174,7 @@ function Page() {
           </Button>
         </div>
       </div>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }
 

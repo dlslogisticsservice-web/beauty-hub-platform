@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { getAdminSubscriptions, updateCenterAdmin } from "@/lib/admin.functions";
@@ -58,9 +58,7 @@ function Page() {
   }, [data, filter]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="admin">
         <h1 className="text-display text-5xl">{t("admin.subscriptions")}</h1>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -124,8 +122,6 @@ function Page() {
             </tbody>
           </table>
         </div>
-      </div>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }

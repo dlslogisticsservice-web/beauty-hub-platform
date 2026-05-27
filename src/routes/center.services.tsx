@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,9 +115,7 @@ function Page() {
   const country = centerData?.country ?? "EG";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="center">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-display text-5xl">{t("center.my_services")}</h1>
@@ -160,7 +158,6 @@ function Page() {
             ))}
           </div>
         )}
-      </div>
 
       <Sheet open={!!form} onOpenChange={(o) => !o && setForm(null)}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto">
@@ -224,7 +221,6 @@ function Page() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }

@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { Calendar, DollarSign, Percent, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,13 +137,9 @@ function Page() {
 
 function Shell({ children, t }: { children: React.ReactNode; t: (k: string) => string }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 flex-1">
-        <h1 className="text-display text-5xl">{t("center.dashboard")}</h1>
-        <div className="mt-8">{children}</div>
-      </div>
-      <SiteFooter />
-    </div>
+    <DashboardLayout role="center">
+      <h1 className="text-display text-5xl">{t("center.dashboard")}</h1>
+      <div className="mt-8">{children}</div>
+    </DashboardLayout>
   );
 }

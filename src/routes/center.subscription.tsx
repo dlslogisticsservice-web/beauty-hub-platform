@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Check, X, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/hooks/use-i18n";
@@ -43,9 +43,7 @@ function Page() {
   const currentPlan = data?.center?.subscription_plan ?? "free";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="center">
         <h1 className="text-display text-5xl">{t("center.subscription")}</h1>
         <p className="mt-2 text-muted-foreground">Choose the plan that fits your center.</p>
 
@@ -87,9 +85,7 @@ function Page() {
             );
           })}
         </div>
-      </div>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }
 

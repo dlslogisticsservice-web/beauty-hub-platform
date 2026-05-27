@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { getAdminCenters, updateCenterAdmin } from "@/lib/admin.functions";
@@ -69,9 +69,7 @@ function Page() {
   }, [data, search, plan, verified]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="admin">
         <h1 className="text-display text-5xl">{t("admin.centers")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -146,8 +144,6 @@ function Page() {
             </tbody>
           </table>
         </div>
-      </div>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }

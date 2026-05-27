@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { getCommissionsOverview, getCenterBookingsForAdmin, updateCenterCommissionRate } from "@/lib/system.functions";
 import { formatPrice } from "@/lib/currency";
@@ -68,9 +68,7 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="admin">
         <h1 className="text-display text-5xl">{t("admin.commissions")}</h1>
 
         {!data ? <p className="mt-8 text-muted-foreground">{t("common.loading")}</p> : (
@@ -121,7 +119,6 @@ function Page() {
             </div>
           </>
         )}
-      </div>
 
       <Sheet open={!!openCenter} onOpenChange={(o) => !o && setOpenCenter(null)}>
         <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
@@ -147,7 +144,6 @@ function Page() {
           </div>
         </SheetContent>
       </Sheet>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }

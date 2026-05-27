@@ -48,11 +48,11 @@
   --gold-light:  #F0D060;
   --gold-muted:  #A88820;
   --black:       #0A0A0A;
-  --black-mid:   #141414;
+  --black-mid:   #161616;
   --black-soft:  #1E1E1E;
   --black-edge:  #2A2A2A;
   --white:       #F5F0E8;
-  --white-muted: #A89880;
+  --white-muted: #B09A84;
 
   /* Map to semantic tokens */
   --background: var(--black);
@@ -155,4 +155,15 @@
     color: transparent;
   }
   .border-gold { border-color: var(--gold) !important; }
+  /* Text shadow utilities for legibility on photo backgrounds */
+  .text-shadow { text-shadow: 0 2px 12px rgba(0,0,0,0.80), 0 1px 3px rgba(0,0,0,0.90); }
+  .text-shadow-lg { text-shadow: 0 4px 24px rgba(0,0,0,0.90), 0 2px 8px rgba(0,0,0,0.95); }
+}
+
+@layer base {
+  /* Arabic text: disable letter-spacing (tracking breaks Arabic ligatures) */
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4 { letter-spacing: 0; }
 }

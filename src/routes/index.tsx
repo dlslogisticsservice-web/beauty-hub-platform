@@ -180,7 +180,7 @@ function HomePage() {
           ═══════════════════════════════════════════════════════════ */}
       <section
         className="relative overflow-hidden"
-        style={{ minHeight: "clamp(600px, 88vh, 820px)" }}
+        style={{ minHeight: "clamp(480px, 80vh, 820px)" }}
       >
         {/* ── Background slides (CSS crossfade) ─────────────────── */}
         {HERO_SLIDES.map((slide, i) => (
@@ -254,72 +254,20 @@ function HomePage() {
           </span>
 
           {/* Main headline */}
-          <h1 className="mt-5 text-display leading-[1.02] text-white max-w-2xl"
+          <h1 className="mt-5 text-display leading-[1.02] text-white max-w-2xl text-shadow-lg"
             style={{ fontSize: "clamp(2.6rem, 6vw, 5rem)" }}>
             {t("home.hero_title")}
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-5 max-w-lg text-base sm:text-lg text-white/75 leading-relaxed">
+          <p className="mt-5 max-w-lg text-base sm:text-lg text-white/80 leading-relaxed text-shadow">
             {t("home.hero_subtitle")}
           </p>
 
-          {/* ── Search box ───────────────────────────────────────── */}
-          <div className="mt-7 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md p-3 shadow-soft max-w-2xl">
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative flex-1">
-                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder={t("home.search_placeholder")}
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="pl-9 border-0 bg-transparent focus-visible:ring-0 text-white placeholder:text-white/40"
-                />
-              </div>
-
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="sm:w-44 rounded-lg border-0 bg-white/10 px-3 py-2 text-sm text-white focus:outline-none focus:ring-0"
-              >
-                <option className="bg-background text-foreground" value="">
-                  {t("home.search_all")}
-                </option>
-                {CATEGORIES.map((c) => (
-                  <option
-                    key={c}
-                    value={c}
-                    className="bg-background text-foreground"
-                  >
-                    {t(`categories.${c}`)}
-                  </option>
-                ))}
-              </select>
-
-              <Button
-                onClick={handleSearch}
-                className="rounded-xl bg-gradient-primary px-6 shadow-soft font-semibold"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                {t("home.search_button")}
-              </Button>
-            </div>
-          </div>
-
-          {/* ── Category quick-links ─────────────────────────────── */}
-          <div className="mt-5 flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => (
-              <Link
-                key={c}
-                to="/centers"
-                search={{ category: c } as never}
-                className="rounded-full border border-white/15 bg-white/8 backdrop-blur-sm px-3.5 py-1.5 text-xs text-white/85 hover:border-primary hover:bg-card hover:text-primary transition-all duration-200"
-              >
-                {t(`categories.${c}`)}
-              </Link>
-            ))}
-          </div>
+          {/* ── CTA scroll hint ──────────────────────────────────── */}
+          <p className="mt-8 text-sm text-white/50 tracking-wide">
+            ↓ {locale === "ar" ? "ابحث عن مركزك" : "Find your center below"}
+          </p>
         </div>
 
         {/* ── Slide dot indicators ────────────────────────────────── */}
@@ -363,9 +311,65 @@ function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
+          FLOATING SEARCH CARD — below hero, overlaps via -mt
+          ═══════════════════════════════════════════════════════════ */}
+      <div className="relative z-10 mx-auto w-full max-w-4xl px-4 sm:px-6 -mt-10 sm:-mt-14">
+        <div className="rounded-2xl border border-border/60 bg-card shadow-glow p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {/* City input */}
+            <div className="relative flex-1">
+              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t("home.search_placeholder")}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="pl-9 border-0 bg-secondary/60 focus-visible:ring-1"
+              />
+            </div>
+
+            {/* Category select */}
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="sm:w-44 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              <option value="">{t("home.search_all")}</option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{t(`categories.${c}`)}</option>
+              ))}
+            </select>
+
+            {/* Search button */}
+            <Button
+              onClick={handleSearch}
+              className="rounded-xl bg-gradient-primary px-6 shadow-soft font-semibold shrink-0"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              {t("home.search_button")}
+            </Button>
+          </div>
+
+          {/* Category quick-links */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {CATEGORIES.map((c) => (
+              <Link
+                key={c}
+                to="/centers"
+                search={{ category: c } as never}
+                className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-all duration-200"
+              >
+                {t(`categories.${c}`)}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════
           TRUST STATS
           ═══════════════════════════════════════════════════════════ */}
-      <section className="border-b border-border bg-card/30">
+      <section className="border-b border-border bg-card/30 mt-10">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {[

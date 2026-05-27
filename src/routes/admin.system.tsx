@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { getSystemInfo, toggleFeatureFlag, createAdminUser } from "@/lib/system.functions";
 
@@ -66,9 +66,7 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1 space-y-10">
+    <DashboardLayout role="admin" contentClassName="space-y-10">
         <div>
           <h1 className="text-display text-5xl">System</h1>
           <p className="mt-2 text-muted-foreground">Super admin controls.</p>
@@ -152,7 +150,6 @@ function Page() {
             </section>
           </>
         )}
-      </div>
 
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
         <DialogContent>
@@ -178,7 +175,6 @@ function Page() {
         </DialogContent>
       </Dialog>
 
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }

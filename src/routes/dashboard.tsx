@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -131,9 +131,7 @@ function CustomerDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="customer">
         <h1 className="text-display text-5xl">{t("dashboard.title")}</h1>
         <p className="mt-2 text-muted-foreground">{t("dashboard.subtitle")}</p>
 
@@ -151,7 +149,6 @@ function CustomerDashboard() {
             <TabsContent value="cancelled" className="mt-6">{renderList(cancelled, t("dashboard.no_cancelled"))}</TabsContent>
           </Tabs>
         )}
-      </div>
 
       <Dialog open={!!reviewFor} onOpenChange={(o) => !o && setReviewFor(null)}>
         <DialogContent>
@@ -172,7 +169,6 @@ function CustomerDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }

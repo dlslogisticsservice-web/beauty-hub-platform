@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { getAdminBookings } from "@/lib/admin.functions";
@@ -52,9 +52,7 @@ function Page() {
   }, [data]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-10 flex-1">
+    <DashboardLayout role="admin">
         <h1 className="text-display text-5xl">{t("admin.all_bookings")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:max-w-2xl">
@@ -110,8 +108,6 @@ function Page() {
             </tbody>
           </table>
         </div>
-      </div>
-      <SiteFooter />
-    </div>
+    </DashboardLayout>
   );
 }
