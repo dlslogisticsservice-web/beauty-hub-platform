@@ -39,7 +39,15 @@
     "top_rated": "الأعلى تقييماً",
     "browse_all": "تصفح الكل ←",
     "no_centers": "لا توجد مراكز بعد",
-    "list_yours": "أضف مركزك"
+    "list_yours": "أضف مركزك",
+    "stats": {
+      "centers": "مركز تجميل",
+      "bookings": "حجز مكتمل",
+      "cities": "مدينة",
+      "rating": "متوسط التقييم"
+    },
+    "testimonials_title": "آلاف العملاء يثقون بنا",
+    "testimonials_sub": "تجارب حقيقية من عملائنا"
   },
   "browse": {
     "title": "كل المراكز",

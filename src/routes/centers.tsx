@@ -78,59 +78,65 @@ function BrowsePage() {
         <h1 className="text-display text-5xl">{t("centers.title")}</h1>
         <p className="text-muted-foreground mt-2">{t("browse.subtitle")}</p>
 
-        <div className="mt-8 rounded-2xl border border-border bg-card p-4 shadow-soft flex flex-col gap-3 md:flex-row md:items-center md:flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
+        <div className="mt-8 rounded-2xl border border-border bg-card p-4 shadow-soft">
+          {/* Search row */}
+          <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t("browse.search_name")}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && update({ q: q || undefined })}
-              className="pl-9 border-0 bg-transparent focus-visible:ring-0"
+              className="pl-9 border-0 bg-transparent focus-visible:ring-0 w-full"
             />
           </div>
 
-          <select
-            value={search.country ?? ""}
-            onChange={(e) => update({ country: (e.target.value || undefined) as "EG" | "SA" | undefined, city: undefined })}
-            className="md:w-40 rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="">{t("auth.country")}</option>
-            <option value="EG">🇪🇬 {t("common.country_eg")}</option>
-            <option value="SA">🇸🇦 {t("common.country_sa")}</option>
-          </select>
+          {/* Filter selects — 2-col grid on mobile, flex row on desktop */}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+            <select
+              value={search.country ?? ""}
+              onChange={(e) => update({ country: (e.target.value || undefined) as "EG" | "SA" | undefined, city: undefined })}
+              className="w-full sm:w-36 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">{t("auth.country")}</option>
+              <option value="EG">🇪🇬 {t("common.country_eg")}</option>
+              <option value="SA">🇸🇦 {t("common.country_sa")}</option>
+            </select>
 
-          <select
-            value={search.city ?? ""}
-            onChange={(e) => update({ city: e.target.value || undefined })}
-            className="md:w-48 rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="">{t("centers.filter_city")}</option>
-            {cityOptions.map((c) => (
-              <option key={`${c.country}-${c.value}`} value={c.value}>
-                {locale === "ar" ? c.label_ar : c.label_en}
-                {!search.country ? ` — ${c.country}` : ""}
-              </option>
-            ))}
-          </select>
+            <select
+              value={search.city ?? ""}
+              onChange={(e) => update({ city: e.target.value || undefined })}
+              className="w-full sm:w-44 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">{t("centers.filter_city")}</option>
+              {cityOptions.map((c) => (
+                <option key={`${c.country}-${c.value}`} value={c.value}>
+                  {locale === "ar" ? c.label_ar : c.label_en}
+                  {!search.country ? ` — ${c.country}` : ""}
+                </option>
+              ))}
+            </select>
 
-          <select
-            value={search.category ?? ""}
-            onChange={(e) => update({ category: e.target.value || undefined })}
-            className="md:w-44 rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="">{t("browse.all_services")}</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{t(`categories.${c}`)}</option>)}
-          </select>
+            <select
+              value={search.category ?? ""}
+              onChange={(e) => update({ category: e.target.value || undefined })}
+              className="w-full sm:w-40 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="">{t("browse.all_services")}</option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{t(`categories.${c}`)}</option>
+              ))}
+            </select>
 
-          <select
-            value={search.sort ?? "rating"}
-            onChange={(e) => update({ sort: e.target.value as "rating" | "newest" })}
-            className="md:w-44 rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="rating">{t("centers.sort_rating")}</option>
-            <option value="newest">{t("centers.sort_newest")}</option>
-          </select>
+            <select
+              value={search.sort ?? "rating"}
+              onChange={(e) => update({ sort: e.target.value as "rating" | "newest" })}
+              className="w-full sm:w-40 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="rating">{t("centers.sort_rating")}</option>
+              <option value="newest">{t("centers.sort_newest")}</option>
+            </select>
+          </div>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">{data?.centers?.length ?? 0} {t("browse.found")}</p>

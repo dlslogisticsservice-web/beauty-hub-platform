@@ -39,7 +39,15 @@
     "top_rated": "Top Rated",
     "browse_all": "Browse all →",
     "no_centers": "No centers yet",
-    "list_yours": "List your center"
+    "list_yours": "List your center",
+    "stats": {
+      "centers": "Beauty Centers",
+      "bookings": "Bookings Made",
+      "cities": "Cities Covered",
+      "rating": "Average Rating"
+    },
+    "testimonials_title": "Loved by thousands",
+    "testimonials_sub": "Real experiences from verified clients"
   },
   "browse": {
     "title": "All Centers",

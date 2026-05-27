@@ -284,6 +284,22 @@ function BookingPage() {
         </div>
       </div>
 
+      {/* ── Sticky mobile booking CTA (above bottom nav bar) ──────── */}
+      <div className="fixed bottom-16 inset-x-0 md:hidden z-30 px-4 pb-3 pt-4 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
+        <Button
+          onClick={onSubmit}
+          disabled={submitting || !date || !time}
+          className="w-full rounded-full bg-gradient-primary shadow-soft pointer-events-auto"
+          size="lg"
+        >
+          {submitting
+            ? t("booking.confirming")
+            : date && time
+              ? `${t("booking.confirm")} · ${formatPrice(svc.service.price, country, locale)}`
+              : t("booking.pick_slot")}
+        </Button>
+      </div>
+
       <Dialog open={!!iframeUrl} onOpenChange={(o) => { if (!o) { setIframeUrl(null); navigate({ to: "/dashboard" }); } }}>
         <DialogContent className="max-w-4xl h-[85vh] p-0 overflow-hidden">
           <DialogHeader className="px-6 py-4 border-b">
