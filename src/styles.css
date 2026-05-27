@@ -43,18 +43,18 @@
 :root {
   --radius: 0.75rem;
 
-  /* Black & Gold palette */
+  /* ── Black & Gold luxury palette ─────────────────────────────── */
   --gold:        #D4AF37;
   --gold-light:  #F0D060;
   --gold-muted:  #A88820;
-  --black:       #0A0A0A;
-  --black-mid:   #161616;
-  --black-soft:  #1E1E1E;
-  --black-edge:  #2A2A2A;
-  --white:       #F5F0E8;
-  --white-muted: #B09A84;
+  --black:       #0D0D0D;       /* page bg — slightly lifted from pure black */
+  --black-mid:   #1C1C1C;       /* cards — noticeably brighter than bg */
+  --black-soft:  #262626;       /* secondary / hover states */
+  --black-edge:  #333333;       /* borders — clearly visible */
+  --white:       #F5F0E8;       /* primary text — warm off-white */
+  --white-muted: #C4AB90;       /* muted text — readable warm tone */
 
-  /* Map to semantic tokens */
+  /* ── Semantic tokens ─────────────────────────────────────────── */
   --background: var(--black);
   --foreground: var(--white);
 
@@ -89,13 +89,16 @@
   --danger:  #F44336;
   --info:    #2196F3;
 
-  --gradient-hero: radial-gradient(ellipse at top, rgba(212,175,55,0.12), transparent 60%), linear-gradient(180deg, #0A0A0A, #141414);
+  /* ── Gradients & shadows ─────────────────────────────────────── */
+  --gradient-hero: radial-gradient(ellipse at top, rgba(212,175,55,0.10), transparent 55%), linear-gradient(180deg, #0D0D0D, #1C1C1C);
   --gradient-primary: linear-gradient(135deg, #D4AF37, #F0D060);
   --gradient-gold-text: linear-gradient(135deg, #D4AF37 0%, #F0D060 100%);
-  --shadow-soft: 0 10px 40px -10px rgba(212,175,55,0.25);
-  --shadow-glow: 0 0 60px rgba(212,175,55,0.35);
+  --shadow-soft:  0 8px 32px -8px rgba(212,175,55,0.22), 0 2px 8px rgba(0,0,0,0.40);
+  --shadow-glow:  0 0 48px rgba(212,175,55,0.28), 0 4px 20px rgba(0,0,0,0.50);
+  --shadow-card:  0 2px 12px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.25);
 
-  --sidebar: var(--black);
+  /* ── Sidebar tokens ──────────────────────────────────────────── */
+  --sidebar: var(--black-mid);
   --sidebar-foreground: var(--white);
   --sidebar-primary: var(--gold);
   --sidebar-primary-foreground: var(--black);
@@ -129,24 +132,46 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; color: var(--white); }
+
+  /* Heading hierarchy: display font, readable weight, warm white */
+  h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; color: var(--white); }
+  h2 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; color: var(--white); }
+  h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; color: var(--white); }
+  h4 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.005em; color: var(--white); }
+
+  /* Arabic: Tajawal font, zero letter-spacing (ligature protection) */
   [dir="rtl"] { font-family: "Tajawal", var(--font-sans); }
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4 { letter-spacing: 0; font-weight: 700; }
+
   a { transition: color 0.15s ease; }
   a:hover { color: var(--gold); }
   :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 }
 
 @layer utilities {
-  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  /* ── Backgrounds ───────────────────────────────────────────────── */
+  .bg-gradient-hero    { background-image: var(--gradient-hero); }
   .bg-gradient-primary { background-image: var(--gradient-primary); }
+
+  /* ── Shadows ───────────────────────────────────────────────────── */
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+
+  /* ── Typography ────────────────────────────────────────────────── */
   .text-display { font-family: var(--font-display); }
+
   .text-gold-gradient {
     background: var(--gradient-gold-text);
     -webkit-background-clip: text;
@@ -154,16 +179,32 @@
     -webkit-text-fill-color: transparent;
     color: transparent;
   }
-  .border-gold { border-color: var(--gold) !important; }
-  /* Text shadow utilities for legibility on photo backgrounds */
-  .text-shadow { text-shadow: 0 2px 12px rgba(0,0,0,0.80), 0 1px 3px rgba(0,0,0,0.90); }
-  .text-shadow-lg { text-shadow: 0 4px 24px rgba(0,0,0,0.90), 0 2px 8px rgba(0,0,0,0.95); }
-}
 
-@layer base {
-  /* Arabic text: disable letter-spacing (tracking breaks Arabic ligatures) */
-  [dir="rtl"] h1,
-  [dir="rtl"] h2,
-  [dir="rtl"] h3,
-  [dir="rtl"] h4 { letter-spacing: 0; }
+  /* Hero text shadows — layered for depth, not harshness */
+  .text-shadow {
+    text-shadow:
+      0 1px 2px rgba(0,0,0,0.95),
+      0 3px 14px rgba(0,0,0,0.70);
+  }
+  .text-shadow-lg {
+    text-shadow:
+      0 1px 2px rgba(0,0,0,0.98),
+      0 3px 16px rgba(0,0,0,0.80),
+      0 8px 40px rgba(0,0,0,0.60);
+  }
+
+  /* Soft gold glow for premium accents */
+  .text-glow-gold {
+    text-shadow: 0 0 24px rgba(212,175,55,0.35), 0 0 6px rgba(212,175,55,0.20);
+  }
+
+  .border-gold { border-color: var(--gold) !important; }
+
+  /* Card elevation variants */
+  .card-elevated { background-color: var(--black-soft); }
+  .card-glass {
+    background: rgba(28,28,28,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
 }
