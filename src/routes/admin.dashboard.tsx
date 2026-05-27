@@ -1,9 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { format } from "date-fns";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { Calendar, DollarSign, TrendingUp, Store } from "lucide-react";
+
+const AdminRevenueChart = lazy(() =>
+  import("@/components/admin-revenue-chart").then((m) => ({
+    default: m.AdminRevenueChart,
+  }))
+);
 import { Badge } from "@/components/ui/badge";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useAuth } from "@/hooks/use-auth";
@@ -55,14 +60,15 @@ function Page() {
             <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
               <h2 className="text-display text-2xl">{t("admin.monthly_commission")}</h2>
               <div className="mt-6 h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.months}>
-                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12 }} />
-                    <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <Suspense
+                  fallback={
+                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+                      {t("common.loading")}
+                    </div>
+                  }
+                >
+                  <AdminRevenueChart data={data.months} />
+                </Suspense>
               </div>
             </div>
 
