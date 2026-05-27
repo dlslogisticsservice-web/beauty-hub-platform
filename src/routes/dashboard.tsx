@@ -15,6 +15,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import { STATUS_COLORS } from "@/features/dashboard-widgets";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "My bookings — Beauty Hub" }] }),
@@ -27,13 +28,6 @@ type Booking = {
   services: { name: string } | null;
   centers: { name: string; logo_url: string | null; slug: string; country: string | null } | null;
   reviews: { id: string }[];
-};
-
-const statusColors: Record<string, string> = {
-  pending: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30",
-  confirmed: "bg-blue-500/15 text-blue-700 border-blue-500/30",
-  completed: "bg-green-500/15 text-green-700 border-green-500/30",
-  cancelled: "bg-red-500/15 text-red-700 border-red-500/30",
 };
 
 function CustomerDashboard() {
@@ -117,7 +111,7 @@ function CustomerDashboard() {
                   <Link to="/centers/$slug" params={{ slug: b.centers?.slug ?? "" }} className="font-medium hover:text-primary truncate block">{b.centers?.name}</Link>
                   <p className="text-sm text-muted-foreground truncate">{b.services?.name}</p>
                 </div>
-                <Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge>
+                <Badge variant="outline" className={cn("border", STATUS_COLORS[b.status])}>{t(`status.${b.status}`)}</Badge>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm">
                 <span className="flex items-center gap-1.5 text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> {format(new Date(b.scheduled_at), "PP · p")}</span>

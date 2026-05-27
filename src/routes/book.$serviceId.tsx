@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, MapPin, CreditCard, Smartphone, Wallet } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,6 +11,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { cn } from "@/lib/utils";
+import {
+  BookingStepIndicator,
+  TimeSlotPicker,
+  PaymentMethodOption,
+  CardIcon,
+  WalletIcon,
+  CashIcon,
+} from "@/features/booking-step-indicator";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -173,6 +181,7 @@ function BookingPage() {
   }
 
   const showWallet = country === "EG";
+  const currentStep = !date ? 0 : time === null ? 1 : 2;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -198,6 +207,15 @@ function BookingPage() {
 
         <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
           <h3 className="text-display text-2xl">{t("booking.pick_slot")}</h3>
+          <BookingStepIndicator
+            className="mt-4"
+            steps={[
+              { label: t("booking_steps.choose_date") },
+              { label: t("booking_steps.choose_time") },
+              { label: t("booking_steps.payment") },
+            ]}
+            currentStep={currentStep}
+          />
 
           <div className="mt-5">
             <label className="text-sm font-medium">{t("booking.select_date")}</label>
@@ -216,28 +234,14 @@ function BookingPage() {
 
           <div className="mt-5">
             <label className="text-sm font-medium">{t("booking.select_time")}</label>
-            <div className="mt-2 grid grid-cols-4 sm:grid-cols-5 gap-2">
-              {HOURS.map((h) => {
-                const label = `${String(h).padStart(2, "0")}:00`;
-                const taken = takenHours.has(h);
-                const selected = time === label;
-                return (
-                  <button
-                    key={h}
-                    type="button"
-                    disabled={!date || taken}
-                    onClick={() => setTime(label)}
-                    className={cn(
-                      "rounded-xl border text-sm py-2 transition",
-                      selected ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:border-primary",
-                      (taken || !date) && "opacity-40 cursor-not-allowed line-through",
-                    )}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
+            <TimeSlotPicker
+              className="mt-2"
+              hours={HOURS}
+              takenHours={takenHours}
+              selected={time}
+              disabled={!date}
+              onSelect={setTime}
+            />
           </div>
 
           <div className="mt-5">
@@ -248,25 +252,25 @@ function BookingPage() {
           <div className="mt-6">
             <label className="text-sm font-medium">{t("payment.title")}</label>
             <div className="mt-2 grid gap-2">
-              <PayOption
+              <PaymentMethodOption
                 active={payMethod === "card"}
                 onClick={() => setPayMethod("card")}
-                icon={<CreditCard className="h-5 w-5" />}
+                icon={<CardIcon className="h-5 w-5" />}
                 title={t("payment.card")}
               />
               {showWallet && (
-                <PayOption
+                <PaymentMethodOption
                   active={payMethod === "wallet"}
                   onClick={() => setPayMethod("wallet")}
-                  icon={<Smartphone className="h-5 w-5" />}
+                  icon={<WalletIcon className="h-5 w-5" />}
                   title={t("payment.wallet")}
                   subtitle={t("payment.wallet_sub")}
                 />
               )}
-              <PayOption
+              <PaymentMethodOption
                 active={payMethod === "cash"}
                 onClick={() => setPayMethod("cash")}
-                icon={<Wallet className="h-5 w-5" />}
+                icon={<CashIcon className="h-5 w-5" />}
                 title={t("payment.cash")}
                 subtitle={t("payment.cash_sub")}
               />
@@ -293,26 +297,5 @@ function BookingPage() {
 
       <SiteFooter />
     </div>
-  );
-}
-
-function PayOption({
-  active, onClick, icon, title, subtitle,
-}: { active: boolean; onClick: () => void; icon: React.ReactNode; title: string; subtitle?: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-3 rounded-2xl border p-4 text-start transition",
-        active ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:border-primary/50",
-      )}
-    >
-      <span className={cn("rounded-xl p-2", active ? "bg-primary text-primary-foreground" : "bg-muted")}>{icon}</span>
-      <span className="flex-1">
-        <span className="block font-medium">{title}</span>
-        {subtitle && <span className="block text-xs text-muted-foreground">{subtitle}</span>}
-      </span>
-    </button>
   );
 }

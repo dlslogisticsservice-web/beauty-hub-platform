@@ -13,34 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCenterDashboard, getMyCenter } from "@/lib/center-owner.functions";
 import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import { StatCard } from "@/features/stat-card";
+import { STATUS_COLORS } from "@/features/dashboard-widgets";
 
 export const Route = createFileRoute("/center/dashboard")({
   head: () => ({ meta: [{ title: "Center dashboard — Beauty Hub" }] }),
   component: Page,
 });
-
-const statusColors: Record<string, string> = {
-  pending: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30",
-  confirmed: "bg-blue-500/15 text-blue-700 border-blue-500/30",
-  completed: "bg-green-500/15 text-green-700 border-green-500/30",
-  cancelled: "bg-red-500/15 text-red-700 border-red-500/30",
-};
-
-function Stat({ icon: Icon, label, value, accent }: { icon: typeof Calendar; label: string; value: string; accent?: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-      <div className="flex items-center gap-3">
-        <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary", accent)}>
-          <Icon className="h-5 w-5" />
-        </span>
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
-          <p className="text-display text-2xl mt-0.5">{value}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Page() {
   const { t, locale } = useI18n();
@@ -103,10 +82,10 @@ function Page() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={Calendar} label={t("center.bookings_this_month")} value={String(data.stats?.totalBookings ?? 0)} />
-        <Stat icon={DollarSign} label={t("center.monthly_revenue")} value={formatPrice(data.stats?.revenue ?? 0, country, locale)} />
-        <Stat icon={Percent} label={t("center.net_payout")} value={formatPrice(data.stats?.payout ?? 0, country, locale)} />
-        <Stat icon={Clock} label={t("center.pending_bookings")} value={String(data.stats?.pending ?? 0)} />
+        <StatCard icon={Calendar} label={t("center.bookings_this_month")} value={String(data.stats?.totalBookings ?? 0)} />
+        <StatCard icon={DollarSign} label={t("center.monthly_revenue")} value={formatPrice(data.stats?.revenue ?? 0, country, locale)} />
+        <StatCard icon={Percent} label={t("center.net_payout")} value={formatPrice(data.stats?.payout ?? 0, country, locale)} />
+        <StatCard icon={Clock} label={t("center.pending_bookings")} value={String(data.stats?.pending ?? 0)} />
       </div>
 
       <div className="mt-8 flex flex-wrap gap-3">
@@ -138,7 +117,7 @@ function Page() {
                     <td className="px-4 py-3">{b.customer_name}</td>
                     <td className="px-4 py-3">{b.service_name}</td>
                     <td className="px-4 py-3">{format(new Date(b.scheduled_at), "p")}</td>
-                    <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge></td>
+                    <td className="px-4 py-3"><Badge variant="outline" className={cn("border", STATUS_COLORS[b.status])}>{t(`status.${b.status}`)}</Badge></td>
                     <td className="px-4 py-3">{formatPrice(b.price_paid, country, locale)}</td>
                     <td className="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
                       {b.status === "pending" && <Button size="sm" variant="outline" onClick={() => updateStatus(b.id, "confirmed")}>{t("common.confirm")}</Button>}

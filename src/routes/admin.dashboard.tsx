@@ -11,32 +11,13 @@ import { useI18n } from "@/hooks/use-i18n";
 import { getAdminDashboard } from "@/lib/admin.functions";
 import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import { StatCard } from "@/features/stat-card";
+import { STATUS_COLORS } from "@/features/dashboard-widgets";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin dashboard — Beauty Hub" }] }),
   component: Page,
 });
-
-const statusColors: Record<string, string> = {
-  pending: "bg-yellow-500/15 text-yellow-700 border-yellow-500/30",
-  confirmed: "bg-blue-500/15 text-blue-700 border-blue-500/30",
-  completed: "bg-green-500/15 text-green-700 border-green-500/30",
-  cancelled: "bg-red-500/15 text-red-700 border-red-500/30",
-};
-
-function Stat({ icon: Icon, label, value }: { icon: typeof Calendar; label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary"><Icon className="h-5 w-5" /></span>
-        <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
-          <p className="text-display text-2xl mt-0.5">{value}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Page() {
   const { user, isAdmin, loading } = useAuth();
@@ -65,10 +46,10 @@ function Page() {
         ) : (
           <>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Stat icon={Calendar} label={t("admin.total_bookings")} value={String(data.stats.totalBookings)} />
-              <Stat icon={DollarSign} label={t("admin.platform_revenue")} value={formatPrice(data.stats.revenue, "EG", locale)} />
-              <Stat icon={TrendingUp} label={t("admin.gross_value")} value={formatPrice(data.stats.gross, "EG", locale)} />
-              <Stat icon={Store} label={t("admin.active_centers")} value={String(data.stats.activeCenters)} />
+              <StatCard icon={Calendar} label={t("admin.total_bookings")} value={String(data.stats.totalBookings)} />
+              <StatCard icon={DollarSign} label={t("admin.platform_revenue")} value={formatPrice(data.stats.revenue, "EG", locale)} />
+              <StatCard icon={TrendingUp} label={t("admin.gross_value")} value={formatPrice(data.stats.gross, "EG", locale)} />
+              <StatCard icon={Store} label={t("admin.active_centers")} value={String(data.stats.activeCenters)} />
             </div>
 
             <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
@@ -108,7 +89,7 @@ function Page() {
                         <td className="px-4 py-3">{b.service_name}</td>
                         <td className="px-4 py-3">{formatPrice(Number(b.price_paid), b.country, locale)}</td>
                         <td className="px-4 py-3">{formatPrice(Number(b.commission_amount), b.country, locale)}</td>
-                        <td className="px-4 py-3"><Badge variant="outline" className={cn("border", statusColors[b.status])}>{t(`status.${b.status}`)}</Badge></td>
+                        <td className="px-4 py-3"><Badge variant="outline" className={cn("border", STATUS_COLORS[b.status])}>{t(`status.${b.status}`)}</Badge></td>
                         <td className="px-4 py-3 text-muted-foreground">{format(new Date(b.created_at), "PP")}</td>
                       </tr>
                     ))}
