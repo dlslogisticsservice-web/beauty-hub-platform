@@ -46,3 +46,4 @@ bun.lock
 *.njsproj
 *.sln
 *.sw?
+.vercel
