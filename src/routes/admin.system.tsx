@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -68,7 +68,7 @@ function Page() {
   return (
     <DashboardLayout role="admin" contentClassName="space-y-10">
         <div>
-          <h1 className="text-display text-5xl">System</h1>
+          <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">System</h1>
           <p className="mt-2 text-muted-foreground">Super admin controls.</p>
         </div>
 

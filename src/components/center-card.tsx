@@ -33,7 +33,7 @@ export function CenterCard({ center }: { center: CenterCardData }) {
             {center.name.charAt(0)}
           </div>
         )}
-        {center.subscription_plan === "premium" && (
+        {(center.subscription_plan === "pro" || center.subscription_plan === "premium") && (
           <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-[color:var(--gold)]/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground">
             <Crown className="h-3 w-3" /> {t("centers.featured")}
           </span>

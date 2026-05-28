@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, lazy, Suspense } from "react";
 import { format } from "date-fns";
@@ -42,7 +42,7 @@ function Page() {
 
   return (
     <DashboardLayout role="admin">
-        <h1 className="text-display text-5xl">{t("admin.dashboard")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("admin.dashboard")}</h1>
 
         {isLoading || !data ? (
           <p className="mt-8 text-muted-foreground">{t("common.loading")}</p>

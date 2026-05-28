@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getCenterDashboard, getMyCenter } from "@/lib/center-owner.functions";
+import { sendBookingNotification } from "@/lib/notifications.functions";
 import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { StatCard } from "@/features/stat-card";
@@ -56,6 +57,11 @@ function Page() {
     if (error) return toast.error(error.message);
     toast.success(t(`status.${status}`));
     qc.invalidateQueries({ queryKey: ["center-dashboard"] });
+    // Fire-and-forget WhatsApp notification on meaningful transitions
+    if (status === "confirmed" || status === "cancelled") {
+      const template = status === "confirmed" ? "booking_confirmed" : "booking_cancelled_center";
+      sendBookingNotification({ data: { bookingId: id, template } }).catch(() => {});
+    }
   };
 
   const country = data?.center?.country ?? "EG";
@@ -138,7 +144,7 @@ function Page() {
 function Shell({ children, t }: { children: React.ReactNode; t: (k: string) => string }) {
   return (
     <DashboardLayout role="center">
-      <h1 className="text-display text-5xl">{t("center.dashboard")}</h1>
+      <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("center.dashboard")}</h1>
       <div className="mt-8">{children}</div>
     </DashboardLayout>
   );

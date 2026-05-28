@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -118,7 +118,7 @@ function Page() {
     <DashboardLayout role="center">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-display text-5xl">{t("center.my_services")}</h1>
+            <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("center.my_services")}</h1>
           </div>
           <Button onClick={() => open()} disabled={!centerData} className="rounded-full bg-gradient-primary"><Plus className="h-4 w-4 mr-1" /> {t("center.add_service")}</Button>
         </div>

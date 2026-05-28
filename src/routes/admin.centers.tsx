@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -70,7 +70,7 @@ function Page() {
 
   return (
     <DashboardLayout role="admin">
-        <h1 className="text-display text-5xl">{t("admin.centers")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("admin.centers")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("center.search_customer")} />

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getCenterBookings } from "@/lib/center-owner.functions";
+import { sendBookingNotification } from "@/lib/notifications.functions";
 import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,10 @@ function Page() {
     if (error) return toast.error(error.message);
     toast.success(t(`status.${st}`));
     qc.invalidateQueries({ queryKey: ["center-bookings"] });
+    if (st === "confirmed" || st === "cancelled") {
+      const template = st === "confirmed" ? "booking_confirmed" : "booking_cancelled_center";
+      sendBookingNotification({ data: { bookingId: id, template } }).catch(() => {});
+    }
   };
 
   const summary = useMemo(() => {
@@ -69,7 +74,7 @@ function Page() {
 
   return (
     <DashboardLayout role="center">
-        <h1 className="text-display text-5xl">{t("center.all_bookings")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("center.all_bookings")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-4">
           <Select value={status} onValueChange={setStatus}>

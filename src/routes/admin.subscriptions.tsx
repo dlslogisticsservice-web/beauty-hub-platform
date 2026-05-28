@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -59,7 +59,7 @@ function Page() {
 
   return (
     <DashboardLayout role="admin">
-        <h1 className="text-display text-5xl">{t("admin.subscriptions")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("admin.subscriptions")}</h1>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PLANS.map((p) => (

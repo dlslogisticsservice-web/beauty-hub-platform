@@ -9,6 +9,7 @@ import {
   Sparkles,
   User,
   Percent,
+  BarChart2,
 } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useI18n } from "@/hooks/use-i18n";
@@ -40,12 +41,14 @@ const CENTER_NAV: NavItem[] = [
   { to: "/center/dashboard",    icon: LayoutDashboard, label_en: "Dashboard", label_ar: "لوحة التحكم" },
   { to: "/center/bookings",     icon: Calendar,        label_en: "Bookings",  label_ar: "الحجوزات" },
   { to: "/center/services",     icon: Sparkles,        label_en: "Services",  label_ar: "الخدمات" },
+  { to: "/center/analytics",    icon: BarChart2,       label_en: "Analytics", label_ar: "التحليلات" },
   { to: "/center/subscription", icon: CreditCard,      label_en: "Plans",     label_ar: "الخطط" },
   { to: "/center/profile",      icon: User,            label_en: "Profile",   label_ar: "ملفي الشخصي" },
 ];
 
 const CUSTOMER_NAV: NavItem[] = [
   { to: "/dashboard",      icon: Calendar,        label_en: "My Bookings",   label_ar: "حجوزاتي" },
+  { to: "/profile",        icon: User,            label_en: "My Profile",    label_ar: "ملفي الشخصي" },
   { to: "/centers",        icon: Store,           label_en: "Browse",        label_ar: "استعرض" },
   { to: "/ai-consultant",  icon: Sparkles,        label_en: "AI Consultant", label_ar: "مستشار الذكاء الاصطناعي" },
 ];

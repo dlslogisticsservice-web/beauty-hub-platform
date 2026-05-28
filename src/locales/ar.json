@@ -91,7 +91,12 @@
     "owner_cannot_book": "لا يمكن لأصحاب المراكز الحجز. سجّلي كعميلة.",
     "pick_required": "يرجى اختيار التاريخ والوقت.",
     "unavailable": "الخدمة غير متاحة",
-    "payment_step": "اختر طريقة الدفع"
+    "payment_step": "اختر طريقة الدفع",
+    "confirmed_title": "تم تأكيد حجزك!",
+    "confirmed_subtitle": "تم حجز موعدك. نراكِ قريباً.",
+    "reference": "رقم الحجز",
+    "view_bookings": "عرض حجوزاتي",
+    "reschedule": "إعادة الجدولة"
   },
   "payment": {
     "title": "طريقة الدفع",
@@ -393,6 +398,30 @@
     "empty": "لا توجد مستندات مرفوعة بعد.",
     "staging_ready": "جاهز للرفع",
     "click_inspect": "اضغط لفحص الجودة"
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "subtitle": "إدارة معلوماتك الشخصية.",
+    "full_name": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "whatsapp_opt_in": "استقبال تذكيرات الحجز عبر واتساب",
+    "saved": "تم تحديث الملف الشخصي",
+    "avatar": "الصورة الشخصية",
+    "change_avatar": "تغيير الصورة"
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "subtitle": "الإيرادات وأداء الحجوزات.",
+    "revenue_trend": "مسار الإيرادات (6 أشهر)",
+    "top_services": "أكثر الخدمات حجزاً",
+    "no_data": "لا توجد بيانات كافية بعد.",
+    "month": "الشهر",
+    "revenue": "الإيرادات",
+    "bookings": "الحجوزات",
+    "total_revenue": "إجمالي الإيرادات",
+    "total_bookings": "إجمالي الحجوزات",
+    "avg_booking_value": "متوسط قيمة الحجز",
+    "completion_rate": "معدل الإتمام"
   },
   "plans": {
     "month": "/ شهرياً",

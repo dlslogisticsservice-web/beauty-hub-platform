@@ -91,7 +91,12 @@
     "owner_cannot_book": "Center owners cannot book. Sign up as a customer.",
     "pick_required": "Please pick a date and time.",
     "unavailable": "Service unavailable",
-    "payment_step": "Choose payment method"
+    "payment_step": "Choose payment method",
+    "confirmed_title": "Booking Confirmed!",
+    "confirmed_subtitle": "Your appointment has been booked. See you soon.",
+    "reference": "Booking reference",
+    "view_bookings": "View my bookings",
+    "reschedule": "Reschedule"
   },
   "payment": {
     "title": "Payment method",
@@ -393,6 +398,30 @@
     "empty": "No documents uploaded yet.",
     "staging_ready": "STAGING READY",
     "click_inspect": "Click to inspect quality"
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information.",
+    "full_name": "Full name",
+    "phone": "Phone number",
+    "whatsapp_opt_in": "Receive WhatsApp booking reminders",
+    "saved": "Profile updated",
+    "avatar": "Profile photo",
+    "change_avatar": "Change photo"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Revenue and booking performance.",
+    "revenue_trend": "Revenue trend (6 months)",
+    "top_services": "Top services by bookings",
+    "no_data": "Not enough data yet.",
+    "month": "Month",
+    "revenue": "Revenue",
+    "bookings": "Bookings",
+    "total_revenue": "Total revenue",
+    "total_bookings": "Total bookings",
+    "avg_booking_value": "Avg. booking value",
+    "completion_rate": "Completion rate"
   },
   "plans": {
     "month": "/ month",

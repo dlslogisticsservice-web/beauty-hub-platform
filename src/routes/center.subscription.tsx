@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -44,7 +44,7 @@ function Page() {
 
   return (
     <DashboardLayout role="center">
-        <h1 className="text-display text-5xl">{t("center.subscription")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("center.subscription")}</h1>
         <p className="mt-2 text-muted-foreground">Choose the plan that fits your center.</p>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">

@@ -26,6 +26,7 @@ import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
 import { formatPrice } from "@/lib/currency";
 import { cityLabel } from "@/data/cities";
 import { initiatePaymobPaymentFn, isPaymobConfiguredFn } from "@/lib/paymob.functions";
+import { sendBookingNotification } from "@/lib/notifications.functions";
 
 export const Route = createFileRoute("/book/$serviceId")({
   head: () => ({ meta: [{ title: "Book a service — Beauty Hub" }] }),
@@ -47,6 +48,7 @@ function BookingPage() {
   const [payMethod, setPayMethod] = useState<PayMethod>("cash");
   const [submitting, setSubmitting] = useState(false);
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
+  const [confirmedId, setConfirmedId] = useState<string | null>(null);
 
   const { data: svc, isLoading } = useQuery({
     queryKey: ["booking-service", serviceId],
@@ -129,10 +131,13 @@ function BookingPage() {
       return;
     }
 
+    // Fire-and-forget WhatsApp notification (never block navigation on it)
+    sendBookingNotification({ data: { bookingId: inserted.id, template: "booking_created" } }).catch(() => {});
+
     if (finalMethod === "cash") {
       setSubmitting(false);
       toast.success(t("booking.success"));
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/booking-confirmed", search: { id: inserted.id } });
       return;
     }
 
@@ -149,6 +154,7 @@ function BookingPage() {
         navigate({ to: "/dashboard" });
         return;
       }
+      setConfirmedId(inserted.id);
       setIframeUrl(result.iframeUrl);
     } catch (e) {
       toast.error((e as Error).message);
@@ -300,7 +306,7 @@ function BookingPage() {
         </Button>
       </div>
 
-      <Dialog open={!!iframeUrl} onOpenChange={(o) => { if (!o) { setIframeUrl(null); navigate({ to: "/dashboard" }); } }}>
+      <Dialog open={!!iframeUrl} onOpenChange={(o) => { if (!o) { setIframeUrl(null); navigate({ to: "/booking-confirmed", search: { id: confirmedId ?? undefined } }); } }}>
         <DialogContent className="max-w-4xl h-[85vh] p-0 overflow-hidden">
           <DialogHeader className="px-6 py-4 border-b">
             <DialogTitle>{t("payment.iframe_title")}</DialogTitle>

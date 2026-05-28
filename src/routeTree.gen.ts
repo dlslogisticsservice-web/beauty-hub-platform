@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CentersRouteImport } from './routes/centers'
+import { Route as BookingConfirmedRouteImport } from './routes/booking-confirmed'
 import { Route as AiConsultantRouteImport } from './routes/ai-consultant'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
@@ -20,6 +22,7 @@ import { Route as CenterProfileRouteImport } from './routes/center.profile'
 import { Route as CenterOnboardingRouteImport } from './routes/center.onboarding'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
 import { Route as CenterBookingsRouteImport } from './routes/center.bookings'
+import { Route as CenterAnalyticsRouteImport } from './routes/center.analytics'
 import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
@@ -30,6 +33,11 @@ import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions
 import { Route as AdminCentersRouteImport } from './routes/admin.centers'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -38,6 +46,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const CentersRoute = CentersRouteImport.update({
   id: '/centers',
   path: '/centers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingConfirmedRoute = BookingConfirmedRouteImport.update({
+  id: '/booking-confirmed',
+  path: '/booking-confirmed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiConsultantRoute = AiConsultantRouteImport.update({
@@ -83,6 +96,11 @@ const CenterDashboardRoute = CenterDashboardRouteImport.update({
 const CenterBookingsRoute = CenterBookingsRouteImport.update({
   id: '/center/bookings',
   path: '/center/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterAnalyticsRoute = CenterAnalyticsRouteImport.update({
+  id: '/center/analytics',
+  path: '/center/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookServiceIdRoute = BookServiceIdRouteImport.update({
@@ -134,8 +152,10 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-consultant': typeof AiConsultantRoute
+  '/booking-confirmed': typeof BookingConfirmedRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/commissions': typeof AdminCommissionsRoute
@@ -145,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/analytics': typeof CenterAnalyticsRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/center/onboarding': typeof CenterOnboardingRoute
@@ -156,8 +177,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-consultant': typeof AiConsultantRoute
+  '/booking-confirmed': typeof BookingConfirmedRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/commissions': typeof AdminCommissionsRoute
@@ -167,6 +190,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/analytics': typeof CenterAnalyticsRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/center/onboarding': typeof CenterOnboardingRoute
@@ -179,8 +203,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ai-consultant': typeof AiConsultantRoute
+  '/booking-confirmed': typeof BookingConfirmedRoute
   '/centers': typeof CentersRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/centers': typeof AdminCentersRoute
   '/admin/commissions': typeof AdminCommissionsRoute
@@ -190,6 +216,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/book/$serviceId': typeof BookServiceIdRoute
+  '/center/analytics': typeof CenterAnalyticsRoute
   '/center/bookings': typeof CenterBookingsRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/center/onboarding': typeof CenterOnboardingRoute
@@ -203,8 +230,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ai-consultant'
+    | '/booking-confirmed'
     | '/centers'
     | '/dashboard'
+    | '/profile'
     | '/admin/bookings'
     | '/admin/centers'
     | '/admin/commissions'
@@ -214,6 +243,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
+    | '/center/analytics'
     | '/center/bookings'
     | '/center/dashboard'
     | '/center/onboarding'
@@ -225,8 +255,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ai-consultant'
+    | '/booking-confirmed'
     | '/centers'
     | '/dashboard'
+    | '/profile'
     | '/admin/bookings'
     | '/admin/centers'
     | '/admin/commissions'
@@ -236,6 +268,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
+    | '/center/analytics'
     | '/center/bookings'
     | '/center/dashboard'
     | '/center/onboarding'
@@ -247,8 +280,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ai-consultant'
+    | '/booking-confirmed'
     | '/centers'
     | '/dashboard'
+    | '/profile'
     | '/admin/bookings'
     | '/admin/centers'
     | '/admin/commissions'
@@ -258,6 +293,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/book/$serviceId'
+    | '/center/analytics'
     | '/center/bookings'
     | '/center/dashboard'
     | '/center/onboarding'
@@ -270,8 +306,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiConsultantRoute: typeof AiConsultantRoute
+  BookingConfirmedRoute: typeof BookingConfirmedRoute
   CentersRoute: typeof CentersRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  ProfileRoute: typeof ProfileRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCentersRoute: typeof AdminCentersRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
@@ -281,6 +319,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   BookServiceIdRoute: typeof BookServiceIdRoute
+  CenterAnalyticsRoute: typeof CenterAnalyticsRoute
   CenterBookingsRoute: typeof CenterBookingsRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
   CenterOnboardingRoute: typeof CenterOnboardingRoute
@@ -291,6 +330,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -303,6 +349,13 @@ declare module '@tanstack/react-router' {
       path: '/centers'
       fullPath: '/centers'
       preLoaderRoute: typeof CentersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking-confirmed': {
+      id: '/booking-confirmed'
+      path: '/booking-confirmed'
+      fullPath: '/booking-confirmed'
+      preLoaderRoute: typeof BookingConfirmedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-consultant': {
@@ -366,6 +419,13 @@ declare module '@tanstack/react-router' {
       path: '/center/bookings'
       fullPath: '/center/bookings'
       preLoaderRoute: typeof CenterBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/analytics': {
+      id: '/center/analytics'
+      path: '/center/analytics'
+      fullPath: '/center/analytics'
+      preLoaderRoute: typeof CenterAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book/$serviceId': {
@@ -448,8 +508,10 @@ const CentersRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiConsultantRoute: AiConsultantRoute,
+  BookingConfirmedRoute: BookingConfirmedRoute,
   CentersRoute: CentersRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  ProfileRoute: ProfileRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCentersRoute: AdminCentersRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
@@ -459,6 +521,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   BookServiceIdRoute: BookServiceIdRoute,
+  CenterAnalyticsRoute: CenterAnalyticsRoute,
   CenterBookingsRoute: CenterBookingsRoute,
   CenterDashboardRoute: CenterDashboardRoute,
   CenterOnboardingRoute: CenterOnboardingRoute,

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Star, MapPin, Phone, BadgeCheck, Crown, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/centers/$slug")({
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-        <h1 className="text-display text-5xl">Center not found</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">Center not found</h1>
         <Link to="/centers" className="mt-6 inline-block text-primary hover:underline">← Browse centers</Link>
       </div>
       <SiteFooter />

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { sendBookingNotification } from "@/lib/notifications.functions";
 import { formatPrice } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { STATUS_COLORS } from "@/features/dashboard-widgets";
@@ -64,6 +65,7 @@ function CustomerDashboard() {
     if (error) return toast.error(error.message);
     toast.success(t("status.cancelled"));
     qc.invalidateQueries({ queryKey: ["my-bookings"] });
+    sendBookingNotification({ data: { bookingId: b.id, template: "booking_cancelled_customer" } }).catch(() => {});
   };
 
   const submitReview = async () => {
@@ -132,7 +134,7 @@ function CustomerDashboard() {
 
   return (
     <DashboardLayout role="customer">
-        <h1 className="text-display text-5xl">{t("dashboard.title")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("dashboard.title")}</h1>
         <p className="mt-2 text-muted-foreground">{t("dashboard.subtitle")}</p>
 
         {isLoading ? (

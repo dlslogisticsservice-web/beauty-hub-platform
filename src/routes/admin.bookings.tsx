@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
@@ -53,7 +53,7 @@ function Page() {
 
   return (
     <DashboardLayout role="admin">
-        <h1 className="text-display text-5xl">{t("admin.all_bookings")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{t("admin.all_bookings")}</h1>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:max-w-2xl">
           <Select value={status} onValueChange={setStatus}>

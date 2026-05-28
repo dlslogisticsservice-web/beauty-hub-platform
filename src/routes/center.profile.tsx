@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -112,7 +112,7 @@ function Page() {
   return (
     <DashboardLayout role="center">
       <div className="max-w-3xl">
-        <h1 className="text-display text-5xl">{form.id ? t("center.edit_profile") : t("center.create_center")}</h1>
+        <h1 className="text-display text-3xl sm:text-4xl lg:text-5xl">{form.id ? t("center.edit_profile") : t("center.create_center")}</h1>
 
         <div className="mt-8 space-y-5 rounded-3xl border border-border bg-card p-6 shadow-soft">
           <div className="grid sm:grid-cols-2 gap-4">
@@ -140,14 +140,14 @@ function Page() {
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <Label>{t("auth.country")}</Label>
-              <select value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value as "EG" | "SA", city: "" })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <select value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value as "EG" | "SA", city: "" })} className="mt-1 w-full rounded-md border border-input bg-input px-3 py-2 text-sm">
                 <option value="EG">🇪🇬 {t("common.country_eg")}</option>
                 <option value="SA">🇸🇦 {t("common.country_sa")}</option>
               </select>
             </div>
             <div>
               <Label>{t("browse.city")}</Label>
-              <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-input px-3 py-2 text-sm">
                 <option value="">{t("centers.filter_city")}</option>
                 {getCitiesForCountry(form.country).map((c) => (
                   <option key={c.value} value={c.value}>{locale === "ar" ? c.label_ar : c.label_en}</option>
