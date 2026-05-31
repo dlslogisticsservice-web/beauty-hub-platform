@@ -312,6 +312,26 @@ const handlers: Record<string, (req: any, res: any) => Promise<void>> = {
 
   'notifications-send': async (req, res) => {
     const WA_API = 'https://graph.facebook.com/v20.0';
+
+    // H3: Normalize phone number to E.164 international format.
+    // Handles Egyptian (01XXXXXXXXX → +2001XXXXXXXXX) and
+    // Saudi (05XXXXXXXXX → +96605XXXXXXXXX) local formats.
+    function normalizePhone(raw: string): string | null {
+      const digits = raw.replace(/\D/g, '');
+      if (!digits) return null;
+      // Already international (starts with country code digits)
+      if (raw.trim().startsWith('+')) return '+' + digits;
+      // Egypt: 11 digits starting with 01
+      if (digits.length === 11 && digits.startsWith('01')) return '+20' + digits;
+      // Saudi: 10 digits starting with 05
+      if (digits.length === 10 && digits.startsWith('05')) return '+966' + digits.slice(1);
+      // Saudi: 9 digits starting with 5 (already dropped the leading 0)
+      if (digits.length === 9 && digits.startsWith('5')) return '+966' + digits;
+      // Already has country code (12+ digits): add +
+      if (digits.length >= 11) return '+' + digits;
+      return null; // unrecognised format — skip
+    }
+
     const isConfigured = () => Boolean(process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_ACCESS_TOKEN);
     const isEnabled = async () => {
       const { data } = await supabaseAdmin.from('feature_flags').select('enabled').eq('key', 'whatsapp_notifications').maybeSingle();
@@ -342,20 +362,30 @@ const handlers: Record<string, (req: any, res: any) => Promise<void>> = {
     const isCustomer = booking.customer_id === userId;
     if (!isAdmin && !isOwner && !isCustomer) return jsonOk(res, { ok: false, error: 'forbidden' });
     const { data: profile } = await supabaseAdmin.from('profiles').select('full_name, phone, whatsapp_opt_in').eq('id', booking.customer_id).maybeSingle();
+
+    // Check opt-in (null = opted in by default unless explicitly set false)
     if (!(profile as any)?.phone || (profile as any)?.whatsapp_opt_in === false) {
       await supabaseAdmin.from('notifications_log').insert({ user_id: booking.customer_id, booking_id: booking.id, channel: 'whatsapp', template, recipient: (profile as any)?.phone ?? null, status: 'skipped', error: !(profile as any)?.phone ? 'no_phone' : 'opted_out' });
       return jsonOk(res, { ok: false, error: 'skipped' });
     }
+
+    // Normalize phone to E.164 before sending
+    const normalizedPhone = normalizePhone((profile as any).phone as string);
+    if (!normalizedPhone) {
+      await supabaseAdmin.from('notifications_log').insert({ user_id: booking.customer_id, booking_id: booking.id, channel: 'whatsapp', template, recipient: (profile as any).phone, status: 'skipped', error: 'invalid_phone_format' });
+      return jsonOk(res, { ok: false, error: 'invalid_phone_format' });
+    }
+
     const enabled = await isEnabled();
     if (!enabled || !isConfigured()) {
-      await supabaseAdmin.from('notifications_log').insert({ user_id: booking.customer_id, booking_id: booking.id, channel: 'whatsapp', template, recipient: (profile as any).phone, status: 'disabled' });
+      await supabaseAdmin.from('notifications_log').insert({ user_id: booking.customer_id, booking_id: booking.id, channel: 'whatsapp', template, recipient: normalizedPhone, status: 'disabled' });
       return jsonOk(res, { ok: true, queued: false });
     }
     const { data: centerInfo } = await supabaseAdmin.from('centers').select('name, name_ar').eq('id', booking.center_id).maybeSingle();
     const when = new Date(booking.scheduled_at).toLocaleString('ar-EG');
     const centerName = (centerInfo as any)?.name_ar || (centerInfo as any)?.name || '';
-    const result = await sendTemplate((profile as any).phone, template, [(profile as any).full_name || '', centerName, when]);
-    await supabaseAdmin.from('notifications_log').insert({ user_id: booking.customer_id, booking_id: booking.id, channel: 'whatsapp', template, recipient: (profile as any).phone, status: result.ok ? 'sent' : 'failed', error: (result as any).error, payload: { messageId: (result as any).messageId } });
+    const result = await sendTemplate(normalizedPhone, template, [(profile as any).full_name || '', centerName, when]);
+    await supabaseAdmin.from('notifications_log').insert({ user_id: booking.customer_id, booking_id: booking.id, channel: 'whatsapp', template, recipient: normalizedPhone, status: result.ok ? 'sent' : 'failed', error: (result as any).error, payload: { messageId: (result as any).messageId } });
     jsonOk(res, { ok: result.ok });
   },
 
@@ -767,7 +797,9 @@ const handlers: Record<string, (req: any, res: any) => Promise<void>> = {
     const { centerId, visible } = req.query ?? {};
     let q = supabaseAdmin.from('reviews').select('id, rating, comment, created_at, customer_id, center_id, booking_id, is_visible, moderation_note').order('created_at', { ascending: false }).limit(200);
     if (centerId) q = q.eq('center_id', centerId);
-    if (visible === 'false') q = q.eq('is_visible', false);
+    // Fix: explicitly filter by is_visible when requested (both true AND false)
+    if (visible === 'true') q = q.eq('is_visible', true);
+    else if (visible === 'false') q = q.eq('is_visible', false);
     const { data: reviews } = await q;
     const centerIds = Array.from(new Set((reviews ?? []).map((r: any) => r.center_id)));
     const customerIds = Array.from(new Set((reviews ?? []).map((r: any) => r.customer_id)));

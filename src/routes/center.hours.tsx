@@ -87,7 +87,8 @@ function Page() {
         return found ? { ...def, is_open: found.is_open, open_time: found.open_time, close_time: found.close_time } : def;
       }));
     }
-    setBlockedDates((hoursData as { blocked_dates?: BlockedDate[] }).blocked_dates ?? []);
+    // API returns key `blocked` (not `blocked_dates`) — match the API response shape
+    setBlockedDates((hoursData as { blocked?: BlockedDate[] }).blocked ?? []);
   }, [hoursData]);
 
   const updateDay = (day: number, patch: Partial<DayHours>) => {

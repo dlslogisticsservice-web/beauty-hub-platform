@@ -24,8 +24,8 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
-import { getBookingStaff, validateCoupon } from "@/lib/center-owner.functions";
+import { getServiceForBooking } from "@/lib/booking.functions";
+import { getBookingSlotsV2, getBookingStaff, validateCoupon } from "@/lib/center-owner.functions";
 import { formatPrice } from "@/lib/currency";
 import { cityLabel } from "@/data/cities";
 import { initiatePaymobPaymentFn, isPaymobConfiguredFn } from "@/lib/paymob.functions";
@@ -36,7 +36,6 @@ export const Route = createFileRoute("/book/$serviceId")({
   component: BookingPage,
 });
 
-const HOURS = Array.from({ length: 13 }, (_, i) => 9 + i);
 type PayMethod = "card" | "wallet" | "cash";
 
 function BookingPage() {
@@ -69,17 +68,36 @@ function BookingPage() {
   });
 
   const dateKey = date ? format(date, "yyyy-MM-dd") : null;
+
+  // C3: Use v2 slots endpoint — respects center hours, blocked dates, staff schedules.
+  // v2 returns AVAILABLE slots as "HH:00" strings + openHour/closeHour range.
   const { data: slotsData } = useQuery({
-    queryKey: ["booked-slots", serviceId, dateKey],
-    queryFn: () => getBookedSlots({ data: { serviceId, date: dateKey! } }),
+    queryKey: ["slots-v2", serviceId, dateKey, selectedStaffId],
+    queryFn: () =>
+      getBookingSlotsV2({
+        data: { serviceId, date: dateKey!, staffId: selectedStaffId ?? undefined },
+      }) as Promise<{ slots: string[]; blocked: boolean; reason?: string; openHour?: number; closeHour?: number }>,
     enabled: !!dateKey,
   });
-  const takenHours = useMemo(
-    () => new Set((slotsData?.slots ?? []).map((iso) => new Date(iso).getHours())),
-    [slotsData],
-  );
 
-  // Staff for this service
+  // Build the displayable hours range and taken-set from v2 response.
+  // v2 returns AVAILABLE slots; everything in [openHour, closeHour) NOT in slots is taken/unavailable.
+  const { hours: bookingHours, takenHours } = useMemo(() => {
+    if (!slotsData || slotsData.blocked) {
+      return { hours: [] as number[], takenHours: new Set<number>() };
+    }
+    const open  = slotsData.openHour  ?? 9;
+    const close = slotsData.closeHour ?? 21;
+    const range: number[] = [];
+    for (let h = open; h < close; h++) range.push(h);
+    const availableSet = new Set(
+      (slotsData.slots ?? []).map((s) => parseInt(s.split(":")[0], 10))
+    );
+    const taken = new Set(range.filter((h) => !availableSet.has(h)));
+    return { hours: range, takenHours: taken };
+  }, [slotsData]);
+
+  // Staff for this service — re-fetch when date changes to honour blocked dates
   const { data: staffData } = useQuery({
     queryKey: ["booking-staff", serviceId, dateKey],
     queryFn: () => getBookingStaff({ data: { serviceId, date: dateKey ?? undefined } }),
@@ -153,8 +171,10 @@ function BookingPage() {
       return;
     }
     const [hh] = time.split(":").map(Number);
-    const scheduled = new Date(date);
-    scheduled.setHours(hh, 0, 0, 0);
+    // H7: Store as nominal UTC so slot checks (which use UTC hours) are consistent.
+    // "9 AM" selected in the UI → stored as T09:00:00Z everywhere, regardless of browser timezone.
+    const dateStr = format(date, "yyyy-MM-dd");
+    const scheduled = new Date(`${dateStr}T${String(hh).padStart(2, "0")}:00:00.000Z`);
 
     const isOnline = payMethod === "card" || payMethod === "wallet";
     const flagOn = Boolean(paymentFlag && paymobConfigured?.configured);
@@ -305,12 +325,21 @@ function BookingPage() {
 
           <div className="mt-5">
             <label className="text-sm font-medium">{t("booking.select_time")}</label>
+            {/* C3: Show closed/blocked banner when center is unavailable on selected date */}
+            {date && slotsData?.blocked && (
+              <div className="mt-2 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-700">
+                {slotsData.reason === "center_holiday"   && "This center is closed on the selected date."}
+                {slotsData.reason === "center_closed"    && "This center does not operate on this day."}
+                {slotsData.reason === "staff_unavailable" && "The selected staff member is unavailable on this date."}
+                {!slotsData.reason && "No availability on this date. Please choose another day."}
+              </div>
+            )}
             <TimeSlotPicker
               className="mt-2"
-              hours={HOURS}
+              hours={bookingHours}
               takenHours={takenHours}
               selected={time}
-              disabled={!date}
+              disabled={!date || !!slotsData?.blocked}
               onSelect={setTime}
             />
           </div>

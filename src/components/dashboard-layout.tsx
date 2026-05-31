@@ -61,6 +61,72 @@ const CUSTOMER_NAV: NavItem[] = [
   { to: "/ai-consultant",  icon: Sparkles,        label_en: "AI Consultant", label_ar: "مستشار الذكاء الاصطناعي" },
 ];
 
+// ── Mobile nav (5-item subset per role) ─────────────────────────────────────
+
+const ADMIN_MOBILE_NAV: NavItem[] = [
+  ADMIN_NAV[0], // Dashboard
+  ADMIN_NAV[1], // Bookings
+  ADMIN_NAV[2], // Centers
+  ADMIN_NAV[3], // Reviews
+  ADMIN_NAV[6], // System
+];
+
+const CENTER_MOBILE_NAV: NavItem[] = [
+  CENTER_NAV[0], // Dashboard
+  CENTER_NAV[1], // Bookings
+  CENTER_NAV[2], // Services
+  CENTER_NAV[4], // Hours
+  CENTER_NAV[8], // Profile
+];
+
+// Customer only has 4 items — show all
+const CUSTOMER_MOBILE_NAV = CUSTOMER_NAV;
+
+function MobileBottomNav({ role }: { role: DashboardRole }) {
+  const { locale } = useI18n();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const navItems =
+    role === "admin"
+      ? ADMIN_MOBILE_NAV
+      : role === "center"
+      ? CENTER_MOBILE_NAV
+      : CUSTOMER_MOBILE_NAV;
+
+  return (
+    <nav
+      className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur border-t border-border flex items-stretch h-16 safe-area-inset-bottom"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
+      {navItems.map((item) => {
+        const isActive =
+          pathname === item.to ||
+          (item.to.length > 1 && pathname.startsWith(item.to + "/"));
+        return (
+          <Link
+            key={item.to}
+            to={item.to as never}
+            className={cn(
+              "flex flex-col items-center justify-center flex-1 gap-1 px-1 transition-colors",
+              isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <item.icon
+              className={cn("h-5 w-5 shrink-0", isActive && "text-primary")}
+            />
+            <span className="text-[10px] leading-none truncate max-w-[52px] text-center">
+              {locale === "ar" ? item.label_ar : item.label_en}
+            </span>
+            {isActive && (
+              <span className="absolute bottom-0.5 h-0.5 w-6 rounded-full bg-primary" />
+            )}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
 // ── DashboardSidebar ─────────────────────────────────────────────────────────
 
 function DashboardSidebar({ role }: { role: DashboardRole }) {
@@ -145,11 +211,13 @@ export function DashboardLayout({
       <SiteHeader />
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-8 sm:py-10 flex-1 lg:flex lg:items-start lg:gap-8">
         <DashboardSidebar role={role} />
-        <main className={cn("flex-1 min-w-0", contentClassName)}>
+        {/* pb-20 on mobile reserves space above the fixed bottom nav */}
+        <main className={cn("flex-1 min-w-0 pb-20 lg:pb-0", contentClassName)}>
           {children}
         </main>
       </div>
       <SiteFooter />
+      <MobileBottomNav role={role} />
     </div>
   );
 }
