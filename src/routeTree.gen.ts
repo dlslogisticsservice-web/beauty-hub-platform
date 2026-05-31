@@ -17,10 +17,13 @@ import { Route as AiConsultantRouteImport } from './routes/ai-consultant'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CentersSlugRouteImport } from './routes/centers.$slug'
 import { Route as CenterSubscriptionRouteImport } from './routes/center.subscription'
+import { Route as CenterStaffRouteImport } from './routes/center.staff'
 import { Route as CenterServicesRouteImport } from './routes/center.services'
 import { Route as CenterProfileRouteImport } from './routes/center.profile'
 import { Route as CenterOnboardingRouteImport } from './routes/center.onboarding'
+import { Route as CenterHoursRouteImport } from './routes/center.hours'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
+import { Route as CenterCouponsRouteImport } from './routes/center.coupons'
 import { Route as CenterBookingsRouteImport } from './routes/center.bookings'
 import { Route as CenterAnalyticsRouteImport } from './routes/center.analytics'
 import { Route as BookServiceIdRouteImport } from './routes/book.$serviceId'
@@ -28,6 +31,7 @@ import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AdminSystemRouteImport } from './routes/admin.system'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
+import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminCentersRouteImport } from './routes/admin.centers'
@@ -73,6 +77,11 @@ const CenterSubscriptionRoute = CenterSubscriptionRouteImport.update({
   path: '/center/subscription',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CenterStaffRoute = CenterStaffRouteImport.update({
+  id: '/center/staff',
+  path: '/center/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CenterServicesRoute = CenterServicesRouteImport.update({
   id: '/center/services',
   path: '/center/services',
@@ -88,9 +97,19 @@ const CenterOnboardingRoute = CenterOnboardingRouteImport.update({
   path: '/center/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CenterHoursRoute = CenterHoursRouteImport.update({
+  id: '/center/hours',
+  path: '/center/hours',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CenterDashboardRoute = CenterDashboardRouteImport.update({
   id: '/center/dashboard',
   path: '/center/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterCouponsRoute = CenterCouponsRouteImport.update({
+  id: '/center/coupons',
+  path: '/center/coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CenterBookingsRoute = CenterBookingsRouteImport.update({
@@ -128,6 +147,11 @@ const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
   path: '/admin/subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReviewsRoute = AdminReviewsRouteImport.update({
+  id: '/admin/reviews',
+  path: '/admin/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -160,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/admin/centers': typeof AdminCentersRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/reviews': typeof AdminReviewsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/system': typeof AdminSystemRoute
   '/auth/login': typeof AuthLoginRoute
@@ -167,10 +192,13 @@ export interface FileRoutesByFullPath {
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/analytics': typeof CenterAnalyticsRoute
   '/center/bookings': typeof CenterBookingsRoute
+  '/center/coupons': typeof CenterCouponsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/hours': typeof CenterHoursRoute
   '/center/onboarding': typeof CenterOnboardingRoute
   '/center/profile': typeof CenterProfileRoute
   '/center/services': typeof CenterServicesRoute
+  '/center/staff': typeof CenterStaffRoute
   '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
@@ -185,6 +213,7 @@ export interface FileRoutesByTo {
   '/admin/centers': typeof AdminCentersRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/reviews': typeof AdminReviewsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/system': typeof AdminSystemRoute
   '/auth/login': typeof AuthLoginRoute
@@ -192,10 +221,13 @@ export interface FileRoutesByTo {
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/analytics': typeof CenterAnalyticsRoute
   '/center/bookings': typeof CenterBookingsRoute
+  '/center/coupons': typeof CenterCouponsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/hours': typeof CenterHoursRoute
   '/center/onboarding': typeof CenterOnboardingRoute
   '/center/profile': typeof CenterProfileRoute
   '/center/services': typeof CenterServicesRoute
+  '/center/staff': typeof CenterStaffRoute
   '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
@@ -211,6 +243,7 @@ export interface FileRoutesById {
   '/admin/centers': typeof AdminCentersRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/reviews': typeof AdminReviewsRoute
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/system': typeof AdminSystemRoute
   '/auth/login': typeof AuthLoginRoute
@@ -218,10 +251,13 @@ export interface FileRoutesById {
   '/book/$serviceId': typeof BookServiceIdRoute
   '/center/analytics': typeof CenterAnalyticsRoute
   '/center/bookings': typeof CenterBookingsRoute
+  '/center/coupons': typeof CenterCouponsRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/hours': typeof CenterHoursRoute
   '/center/onboarding': typeof CenterOnboardingRoute
   '/center/profile': typeof CenterProfileRoute
   '/center/services': typeof CenterServicesRoute
+  '/center/staff': typeof CenterStaffRoute
   '/center/subscription': typeof CenterSubscriptionRoute
   '/centers/$slug': typeof CentersSlugRoute
 }
@@ -238,6 +274,7 @@ export interface FileRouteTypes {
     | '/admin/centers'
     | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/reviews'
     | '/admin/subscriptions'
     | '/admin/system'
     | '/auth/login'
@@ -245,10 +282,13 @@ export interface FileRouteTypes {
     | '/book/$serviceId'
     | '/center/analytics'
     | '/center/bookings'
+    | '/center/coupons'
     | '/center/dashboard'
+    | '/center/hours'
     | '/center/onboarding'
     | '/center/profile'
     | '/center/services'
+    | '/center/staff'
     | '/center/subscription'
     | '/centers/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -263,6 +303,7 @@ export interface FileRouteTypes {
     | '/admin/centers'
     | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/reviews'
     | '/admin/subscriptions'
     | '/admin/system'
     | '/auth/login'
@@ -270,10 +311,13 @@ export interface FileRouteTypes {
     | '/book/$serviceId'
     | '/center/analytics'
     | '/center/bookings'
+    | '/center/coupons'
     | '/center/dashboard'
+    | '/center/hours'
     | '/center/onboarding'
     | '/center/profile'
     | '/center/services'
+    | '/center/staff'
     | '/center/subscription'
     | '/centers/$slug'
   id:
@@ -288,6 +332,7 @@ export interface FileRouteTypes {
     | '/admin/centers'
     | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/reviews'
     | '/admin/subscriptions'
     | '/admin/system'
     | '/auth/login'
@@ -295,10 +340,13 @@ export interface FileRouteTypes {
     | '/book/$serviceId'
     | '/center/analytics'
     | '/center/bookings'
+    | '/center/coupons'
     | '/center/dashboard'
+    | '/center/hours'
     | '/center/onboarding'
     | '/center/profile'
     | '/center/services'
+    | '/center/staff'
     | '/center/subscription'
     | '/centers/$slug'
   fileRoutesById: FileRoutesById
@@ -314,6 +362,7 @@ export interface RootRouteChildren {
   AdminCentersRoute: typeof AdminCentersRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminReviewsRoute: typeof AdminReviewsRoute
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminSystemRoute: typeof AdminSystemRoute
   AuthLoginRoute: typeof AuthLoginRoute
@@ -321,10 +370,13 @@ export interface RootRouteChildren {
   BookServiceIdRoute: typeof BookServiceIdRoute
   CenterAnalyticsRoute: typeof CenterAnalyticsRoute
   CenterBookingsRoute: typeof CenterBookingsRoute
+  CenterCouponsRoute: typeof CenterCouponsRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
+  CenterHoursRoute: typeof CenterHoursRoute
   CenterOnboardingRoute: typeof CenterOnboardingRoute
   CenterProfileRoute: typeof CenterProfileRoute
   CenterServicesRoute: typeof CenterServicesRoute
+  CenterStaffRoute: typeof CenterStaffRoute
   CenterSubscriptionRoute: typeof CenterSubscriptionRoute
 }
 
@@ -386,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CenterSubscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/center/staff': {
+      id: '/center/staff'
+      path: '/center/staff'
+      fullPath: '/center/staff'
+      preLoaderRoute: typeof CenterStaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/center/services': {
       id: '/center/services'
       path: '/center/services'
@@ -407,11 +466,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CenterOnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/center/hours': {
+      id: '/center/hours'
+      path: '/center/hours'
+      fullPath: '/center/hours'
+      preLoaderRoute: typeof CenterHoursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/center/dashboard': {
       id: '/center/dashboard'
       path: '/center/dashboard'
       fullPath: '/center/dashboard'
       preLoaderRoute: typeof CenterDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/coupons': {
+      id: '/center/coupons'
+      path: '/center/coupons'
+      fullPath: '/center/coupons'
+      preLoaderRoute: typeof CenterCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/center/bookings': {
@@ -461,6 +534,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/subscriptions'
       fullPath: '/admin/subscriptions'
       preLoaderRoute: typeof AdminSubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reviews': {
+      id: '/admin/reviews'
+      path: '/admin/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AdminReviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/dashboard': {
@@ -516,6 +596,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminCentersRoute: AdminCentersRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminReviewsRoute: AdminReviewsRoute,
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminSystemRoute: AdminSystemRoute,
   AuthLoginRoute: AuthLoginRoute,
@@ -523,10 +604,13 @@ const rootRouteChildren: RootRouteChildren = {
   BookServiceIdRoute: BookServiceIdRoute,
   CenterAnalyticsRoute: CenterAnalyticsRoute,
   CenterBookingsRoute: CenterBookingsRoute,
+  CenterCouponsRoute: CenterCouponsRoute,
   CenterDashboardRoute: CenterDashboardRoute,
+  CenterHoursRoute: CenterHoursRoute,
   CenterOnboardingRoute: CenterOnboardingRoute,
   CenterProfileRoute: CenterProfileRoute,
   CenterServicesRoute: CenterServicesRoute,
+  CenterStaffRoute: CenterStaffRoute,
   CenterSubscriptionRoute: CenterSubscriptionRoute,
 }
 export const routeTree = rootRouteImport

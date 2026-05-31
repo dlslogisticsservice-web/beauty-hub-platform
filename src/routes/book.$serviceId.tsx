@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin, Tag, X, User2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { cn } from "@/lib/utils";
 import {
@@ -23,6 +25,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { getServiceForBooking, getBookedSlots } from "@/lib/booking.functions";
+import { getBookingStaff, validateCoupon } from "@/lib/center-owner.functions";
 import { formatPrice } from "@/lib/currency";
 import { cityLabel } from "@/data/cities";
 import { initiatePaymobPaymentFn, isPaymobConfiguredFn } from "@/lib/paymob.functions";
@@ -50,6 +53,16 @@ function BookingPage() {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
 
+  // Staff selection
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+
+  // Coupon
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState<{
+    id: string; code: string; discount: number; discount_type: string; discount_value: number;
+  } | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
+
   const { data: svc, isLoading } = useQuery({
     queryKey: ["booking-service", serviceId],
     queryFn: () => getServiceForBooking({ data: { serviceId } }),
@@ -65,6 +78,15 @@ function BookingPage() {
     () => new Set((slotsData?.slots ?? []).map((iso) => new Date(iso).getHours())),
     [slotsData],
   );
+
+  // Staff for this service
+  const { data: staffData } = useQuery({
+    queryKey: ["booking-staff", serviceId, dateKey],
+    queryFn: () => getBookingStaff({ data: { serviceId, date: dateKey ?? undefined } }),
+    enabled: !!svc,
+  });
+  const availableStaff: Array<{ id: string; name: string; title: string | null }> =
+    (staffData as Array<{ id: string; name: string; title: string | null }> | undefined) ?? [];
 
   const { data: paymentFlag } = useQuery({
     queryKey: ["flag", "payment_gateway"],
@@ -87,6 +109,38 @@ function BookingPage() {
 
   const country = (svc?.center?.country ?? "EG") as "EG" | "SA";
   const currency: "EGP" | "SAR" = country === "SA" ? "SAR" : "EGP";
+
+  const basePrice = svc?.service?.price ?? 0;
+  const finalPrice = couponApplied ? Math.max(0, basePrice - couponApplied.discount) : basePrice;
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim() || !svc) return;
+    setCouponChecking(true);
+    try {
+      const result = await validateCoupon({
+        data: {
+          code: couponCode.trim(),
+          centerId: svc.center?.id,
+          bookingAmount: basePrice,
+        },
+      }) as { valid: boolean; error?: string; coupon?: { id: string; code: string; discount: number; discount_type: string; discount_value: number } };
+      if (!result.valid || !result.coupon) {
+        toast.error(result.error ?? t("coupons.invalid"));
+        return;
+      }
+      setCouponApplied(result.coupon);
+      toast.success(t("coupons.applied"));
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : t("coupons.invalid"));
+    } finally {
+      setCouponChecking(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponApplied(null);
+    setCouponCode("");
+  };
 
   const onSubmit = async () => {
     if (!user) { navigate({ to: "/auth/login" }); return; }
@@ -116,7 +170,10 @@ function BookingPage() {
         center_id: svc.center.id,
         scheduled_at: scheduled.toISOString(),
         status: "pending",
-        price_paid: svc.service.price,
+        price_paid: finalPrice,
+        original_price: couponApplied ? basePrice : null,
+        coupon_id: couponApplied?.id ?? null,
+        staff_id: selectedStaffId ?? null,
         // commission_rate intentionally omitted — enforced server-side via DB trigger.
         notes: notes || null,
         payment_method: finalMethod,
@@ -205,9 +262,17 @@ function BookingPage() {
               <Clock className="h-4 w-4" /> {svc.service.duration_minutes} {t("common.minutes_full")}
             </p>
           </div>
-          <div className="mt-6 pt-5 border-t flex items-center justify-between">
-            <span className="text-muted-foreground">{t("booking.total")}</span>
-            <span className="text-display text-3xl text-primary">{formatPrice(svc.service.price, country, locale)}</span>
+          <div className="mt-6 pt-5 border-t">
+            {couponApplied && (
+              <div className="flex items-center justify-between mb-1 text-sm">
+                <span className="text-muted-foreground line-through">{formatPrice(basePrice, country, locale)}</span>
+                <span className="text-green-600 text-xs">-{formatPrice(couponApplied.discount, country, locale)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{t("booking.total")}</span>
+              <span className="text-display text-3xl text-primary">{formatPrice(finalPrice, country, locale)}</span>
+            </div>
           </div>
         </div>
 
@@ -250,9 +315,74 @@ function BookingPage() {
             />
           </div>
 
+          {/* Staff picker — only shown when staff exist for this service */}
+          {availableStaff.length > 0 && (
+            <div className="mt-5">
+              <label className="text-sm font-medium flex items-center gap-1.5">
+                <User2 className="h-4 w-4 text-muted-foreground" />
+                Preferred staff <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+              </label>
+              <Select
+                value={selectedStaffId ?? "any"}
+                onValueChange={(v) => setSelectedStaffId(v === "any" ? null : v)}
+              >
+                <SelectTrigger className="mt-2 bg-input">
+                  <SelectValue placeholder="No preference" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">No preference</SelectItem>
+                  {availableStaff.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}{s.title ? ` · ${s.title}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="mt-5">
             <label className="text-sm font-medium">{t("booking.notes")}</label>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("booking.notes_placeholder")} className="mt-2" rows={3} maxLength={500} />
+          </div>
+
+          {/* Coupon code */}
+          <div className="mt-5">
+            <label className="text-sm font-medium flex items-center gap-1.5">
+              <Tag className="h-4 w-4 text-muted-foreground" />
+              {t("coupons.apply")}
+            </label>
+            {couponApplied ? (
+              <div className="mt-2 flex items-center gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2">
+                <Tag className="h-4 w-4 text-green-600 shrink-0" />
+                <span className="text-sm text-green-700 font-mono flex-1">
+                  {couponApplied.code} — {couponApplied.discount_type === "percent"
+                    ? `${couponApplied.discount_value}% off`
+                    : formatPrice(couponApplied.discount, country, locale)} saved
+                </span>
+                <button onClick={removeCoupon} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="mt-2 flex gap-2">
+                <Input
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder={t("coupons.placeholder")}
+                  className="font-mono uppercase flex-1"
+                  onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                />
+                <Button
+                  variant="outline" size="sm"
+                  onClick={applyCoupon}
+                  disabled={couponChecking || !couponCode.trim()}
+                  className="shrink-0"
+                >
+                  {couponChecking ? "…" : t("coupons.apply")}
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="mt-6">
@@ -284,7 +414,7 @@ function BookingPage() {
           </div>
 
           <Button onClick={onSubmit} disabled={submitting || !date || !time} className="w-full mt-6 rounded-full bg-gradient-primary shadow-soft" size="lg">
-            {submitting ? t("booking.confirming") : `${t("booking.confirm")} · ${formatPrice(svc.service.price, country, locale)}`}
+            {submitting ? t("booking.confirming") : `${t("booking.confirm")} · ${formatPrice(finalPrice, country, locale)}`}
           </Button>
           {!user && <p className="text-xs text-muted-foreground mt-3 text-center">{t("booking.sign_in_hint")}</p>}
         </div>
@@ -301,7 +431,7 @@ function BookingPage() {
           {submitting
             ? t("booking.confirming")
             : date && time
-              ? `${t("booking.confirm")} · ${formatPrice(svc.service.price, country, locale)}`
+              ? `${t("booking.confirm")} · ${formatPrice(finalPrice, country, locale)}`
               : t("booking.pick_slot")}
         </Button>
       </div>

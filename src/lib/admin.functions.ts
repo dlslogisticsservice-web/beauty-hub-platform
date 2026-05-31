@@ -32,3 +32,10 @@ export const getAdminBookings = ({ data }: { data?: { status?: string; centerId?
   get('/api/fn/admin-bookings', { status: data?.status, centerId: data?.centerId });
 
 export const getAdminSubscriptions = () => get('/api/fn/admin-subscriptions');
+
+// ── Phase 3: Reviews ──────────────────────────────────────────────────────
+export const getAdminReviews = ({ data }: { data?: { centerId?: string; visible?: string } } = {}) =>
+  get('/api/fn/admin-reviews', { centerId: data?.centerId, visible: data?.visible });
+
+export const moderateReview = ({ data }: { data: { id: string; is_visible: boolean; moderation_note?: string } }) =>
+  post('/api/fn/admin-review-moderate', data);

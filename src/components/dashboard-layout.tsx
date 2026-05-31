@@ -10,6 +10,10 @@ import {
   User,
   Percent,
   BarChart2,
+  Users,
+  Clock,
+  Tag,
+  Star,
 } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { useI18n } from "@/hooks/use-i18n";
@@ -29,18 +33,22 @@ interface NavItem {
 // ── Nav item definitions (bilingual, no hook required at module level) ────────
 
 const ADMIN_NAV: NavItem[] = [
-  { to: "/admin/dashboard", icon: LayoutDashboard, label_en: "Dashboard",    label_ar: "لوحة التحكم" },
-  { to: "/admin/bookings",  icon: Calendar,         label_en: "Bookings",     label_ar: "الحجوزات" },
-  { to: "/admin/centers",   icon: Store,            label_en: "Centers",      label_ar: "المراكز" },
-  { to: "/admin/commissions", icon: Percent,        label_en: "Commissions",  label_ar: "العمولات" },
-  { to: "/admin/subscriptions", icon: CreditCard,   label_en: "Plans",        label_ar: "الخطط" },
-  { to: "/admin/system",    icon: Settings,         label_en: "System",       label_ar: "النظام" },
+  { to: "/admin/dashboard",     icon: LayoutDashboard, label_en: "Dashboard",    label_ar: "لوحة التحكم" },
+  { to: "/admin/bookings",      icon: Calendar,        label_en: "Bookings",     label_ar: "الحجوزات" },
+  { to: "/admin/centers",       icon: Store,           label_en: "Centers",      label_ar: "المراكز" },
+  { to: "/admin/reviews",       icon: Star,            label_en: "Reviews",      label_ar: "التقييمات" },
+  { to: "/admin/commissions",   icon: Percent,         label_en: "Commissions",  label_ar: "العمولات" },
+  { to: "/admin/subscriptions", icon: CreditCard,      label_en: "Plans",        label_ar: "الخطط" },
+  { to: "/admin/system",        icon: Settings,        label_en: "System",       label_ar: "النظام" },
 ];
 
 const CENTER_NAV: NavItem[] = [
   { to: "/center/dashboard",    icon: LayoutDashboard, label_en: "Dashboard", label_ar: "لوحة التحكم" },
   { to: "/center/bookings",     icon: Calendar,        label_en: "Bookings",  label_ar: "الحجوزات" },
   { to: "/center/services",     icon: Sparkles,        label_en: "Services",  label_ar: "الخدمات" },
+  { to: "/center/staff",        icon: Users,           label_en: "Staff",     label_ar: "الفريق" },
+  { to: "/center/hours",        icon: Clock,           label_en: "Hours",     label_ar: "ساعات العمل" },
+  { to: "/center/coupons",      icon: Tag,             label_en: "Coupons",   label_ar: "الكوبونات" },
   { to: "/center/analytics",    icon: BarChart2,       label_en: "Analytics", label_ar: "التحليلات" },
   { to: "/center/subscription", icon: CreditCard,      label_en: "Plans",     label_ar: "الخطط" },
   { to: "/center/profile",      icon: User,            label_en: "Profile",   label_ar: "ملفي الشخصي" },

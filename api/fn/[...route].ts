@@ -484,6 +484,316 @@ const handlers: Record<string, (req: any, res: any) => Promise<void>> = {
     if (!skinType || !fitzpatrick) return res.status(400).json({ error: 'Missing skinType or fitzpatrick' });
     jsonOk(res, getSkinAnalysis(skinType, concerns, fitzpatrick));
   },
+
+  // ── Phase 3: Staff management ────────────────────────────────────────────
+
+  'staff-list': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { centerId } = req.query ?? {};
+    // If no centerId, infer from owner
+    let cId = centerId as string | undefined;
+    if (!cId) {
+      const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+      if (!center) return jsonOk(res, { staff: [] });
+      cId = center.id;
+    }
+    const { data: staff } = await supabaseAdmin.from('staff').select('id, name, name_ar, title, title_ar, bio, bio_ar, avatar_url, is_active, sort_order, created_at').eq('center_id', cId).order('sort_order', { ascending: true }).order('created_at', { ascending: true });
+    // Load schedules + blocked dates per staff
+    const staffIds = (staff ?? []).map((s: any) => s.id);
+    const [{ data: schedules }, { data: blocked }, { data: svcLinks }] = await Promise.all([
+      staffIds.length ? supabaseAdmin.from('staff_schedules').select('*').in('staff_id', staffIds) : Promise.resolve({ data: [] }),
+      staffIds.length ? supabaseAdmin.from('staff_blocked_dates').select('*').in('staff_id', staffIds).gte('blocked_date', new Date().toISOString().slice(0, 10)) : Promise.resolve({ data: [] }),
+      staffIds.length ? supabaseAdmin.from('service_staff').select('service_id, staff_id').in('staff_id', staffIds) : Promise.resolve({ data: [] }),
+    ]);
+    const schedMap = new Map<string, any[]>();
+    for (const s of schedules ?? []) { if (!schedMap.has(s.staff_id)) schedMap.set(s.staff_id, []); schedMap.get(s.staff_id)!.push(s); }
+    const blockedMap = new Map<string, any[]>();
+    for (const b of blocked ?? []) { if (!blockedMap.has(b.staff_id)) blockedMap.set(b.staff_id, []); blockedMap.get(b.staff_id)!.push(b); }
+    const svcMap = new Map<string, string[]>();
+    for (const l of svcLinks ?? []) { if (!svcMap.has(l.staff_id)) svcMap.set(l.staff_id, []); svcMap.get(l.staff_id)!.push(l.service_id); }
+    const enriched = (staff ?? []).map((s: any) => ({
+      ...s,
+      schedules: schedMap.get(s.id) ?? [],
+      blocked_dates: blockedMap.get(s.id) ?? [],
+      service_ids: svcMap.get(s.id) ?? [],
+    }));
+    jsonOk(res, { staff: enriched });
+  },
+
+  'staff-upsert': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+    if (!center) throw new Error('Forbidden');
+    const { id, name, name_ar, title, title_ar, bio, bio_ar, avatar_url, is_active, sort_order, schedules, service_ids } = req.body ?? {};
+    if (!name) return res.status(400).json({ error: 'Missing name' });
+    const payload = { center_id: center.id, name, name_ar: name_ar || null, title: title || null, title_ar: title_ar || null, bio: bio || null, bio_ar: bio_ar || null, avatar_url: avatar_url || null, is_active: is_active !== false, sort_order: sort_order ?? 0 };
+    let staffId = id as string | undefined;
+    if (id) {
+      const { error } = await supabaseAdmin.from('staff').update(payload).eq('id', id).eq('center_id', center.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { data: inserted, error } = await supabaseAdmin.from('staff').insert(payload).select('id').single();
+      if (error) throw new Error(error.message);
+      staffId = inserted.id;
+    }
+    // Upsert schedules
+    if (Array.isArray(schedules) && staffId) {
+      await supabaseAdmin.from('staff_schedules').delete().eq('staff_id', staffId);
+      if (schedules.length) {
+        const rows = schedules.map((s: any) => ({ staff_id: staffId, day_of_week: s.day_of_week, start_time: s.start_time, end_time: s.end_time }));
+        await supabaseAdmin.from('staff_schedules').insert(rows);
+      }
+    }
+    // Upsert service assignments
+    if (Array.isArray(service_ids) && staffId) {
+      await supabaseAdmin.from('service_staff').delete().eq('staff_id', staffId);
+      if (service_ids.length) {
+        const rows = service_ids.map((svcId: string) => ({ staff_id: staffId, service_id: svcId }));
+        await supabaseAdmin.from('service_staff').insert(rows);
+      }
+    }
+    jsonOk(res, { ok: true, id: staffId });
+  },
+
+  'staff-delete': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { id } = req.body ?? {};
+    if (!id) return res.status(400).json({ error: 'Missing id' });
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+    if (!center) throw new Error('Forbidden');
+    const { error } = await supabaseAdmin.from('staff').delete().eq('id', id).eq('center_id', center.id);
+    if (error) throw new Error(error.message);
+    jsonOk(res, { ok: true });
+  },
+
+  'staff-block-date': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { staffId, date, reason, remove } = req.body ?? {};
+    if (!staffId || !date) return res.status(400).json({ error: 'Missing staffId or date' });
+    // Verify ownership
+    const { data: st } = await supabaseAdmin.from('staff').select('center_id').eq('id', staffId).maybeSingle();
+    if (!st) return res.status(404).json({ error: 'Staff not found' });
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('id', st.center_id).eq('owner_id', userId).maybeSingle();
+    if (!center) throw new Error('Forbidden');
+    if (remove) {
+      await supabaseAdmin.from('staff_blocked_dates').delete().eq('staff_id', staffId).eq('blocked_date', date);
+    } else {
+      const { error } = await supabaseAdmin.from('staff_blocked_dates').upsert({ staff_id: staffId, blocked_date: date, reason: reason || null });
+      if (error) throw new Error(error.message);
+    }
+    jsonOk(res, { ok: true });
+  },
+
+  // ── Phase 3: Center working hours ────────────────────────────────────────
+
+  'center-hours-get': async (req, res) => {
+    const { centerId } = req.query ?? {};
+    if (!centerId) return res.status(400).json({ error: 'Missing centerId' });
+    const [{ data: hours }, { data: blocked }] = await Promise.all([
+      supabaseAdmin.from('center_hours').select('*').eq('center_id', centerId).order('day_of_week'),
+      supabaseAdmin.from('center_blocked_dates').select('*').eq('center_id', centerId).gte('blocked_date', new Date().toISOString().slice(0, 10)).order('blocked_date'),
+    ]);
+    jsonOk(res, { hours: hours ?? [], blocked: blocked ?? [] });
+  },
+
+  'center-hours-save': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+    if (!center) throw new Error('Forbidden');
+    const { hours, blockedDate, blockedReason, removeBlocked } = req.body ?? {};
+    if (Array.isArray(hours)) {
+      // Delete existing and re-insert
+      await supabaseAdmin.from('center_hours').delete().eq('center_id', center.id);
+      if (hours.length) {
+        const rows = hours.map((h: any) => ({ center_id: center.id, day_of_week: h.day_of_week, is_open: h.is_open, open_time: h.open_time, close_time: h.close_time }));
+        const { error } = await supabaseAdmin.from('center_hours').insert(rows);
+        if (error) throw new Error(error.message);
+      }
+    }
+    if (blockedDate) {
+      if (removeBlocked) {
+        await supabaseAdmin.from('center_blocked_dates').delete().eq('center_id', center.id).eq('blocked_date', blockedDate);
+      } else {
+        const { error } = await supabaseAdmin.from('center_blocked_dates').upsert({ center_id: center.id, blocked_date: blockedDate, reason: blockedReason || null });
+        if (error) throw new Error(error.message);
+      }
+    }
+    jsonOk(res, { ok: true });
+  },
+
+  // ── Phase 3: Enhanced booking slots (center hours + staff aware) ──────────
+
+  'booking-slots-v2': async (req, res) => {
+    const { serviceId, date, staffId } = req.query ?? {};
+    if (!serviceId || !date) return res.status(400).json({ error: 'Missing serviceId or date' });
+    // Get service + center
+    const { data: service } = await supabaseAdmin.from('services').select('id, center_id, duration_minutes').eq('id', serviceId).maybeSingle();
+    if (!service) return jsonOk(res, { slots: [], blocked: false });
+    const centerId = service.center_id;
+    const durationMin = service.duration_minutes || 60;
+    const dateObj = new Date(date as string);
+    const dayOfWeek = dateObj.getDay(); // 0=Sun ... 6=Sat
+    // Check if center is blocked on this date
+    const { data: centerBlocked } = await supabaseAdmin.from('center_blocked_dates').select('id').eq('center_id', centerId).eq('blocked_date', date).maybeSingle();
+    if (centerBlocked) return jsonOk(res, { slots: [], blocked: true, reason: 'center_holiday' });
+    // Get center hours for this day (fallback: 09:00-21:00)
+    const { data: dayHours } = await supabaseAdmin.from('center_hours').select('*').eq('center_id', centerId).eq('day_of_week', dayOfWeek).maybeSingle();
+    const isOpen = dayHours ? dayHours.is_open : true;
+    if (!isOpen) return jsonOk(res, { slots: [], blocked: true, reason: 'center_closed' });
+    const openHour = dayHours ? parseInt((dayHours.open_time as string).split(':')[0]) : 9;
+    const closeHour = dayHours ? parseInt((dayHours.close_time as string).split(':')[0]) : 21;
+    // Check staff availability (if staffId specified)
+    let staffOpenHour = openHour;
+    let staffCloseHour = closeHour;
+    let staffBlockedToday = false;
+    if (staffId) {
+      const { data: staffBlock } = await supabaseAdmin.from('staff_blocked_dates').select('id').eq('staff_id', staffId).eq('blocked_date', date).maybeSingle();
+      if (staffBlock) return jsonOk(res, { slots: [], blocked: true, reason: 'staff_unavailable' });
+      const { data: staffSched } = await supabaseAdmin.from('staff_schedules').select('*').eq('staff_id', staffId).eq('day_of_week', dayOfWeek).maybeSingle();
+      if (staffSched) {
+        staffOpenHour = parseInt((staffSched.start_time as string).split(':')[0]);
+        staffCloseHour = parseInt((staffSched.end_time as string).split(':')[0]);
+      }
+    }
+    const effectiveOpen = Math.max(openHour, staffOpenHour);
+    const effectiveClose = Math.min(closeHour, staffCloseHour);
+    // Get existing bookings in this time range (including staff conflict if staffId)
+    const start = new Date(`${date}T00:00:00Z`).toISOString();
+    const end = new Date(`${date}T23:59:59Z`).toISOString();
+    let q = supabaseAdmin.from('bookings').select('scheduled_at, staff_id').eq(staffId ? 'staff_id' : 'service_id', staffId ?? serviceId).neq('status', 'cancelled').gte('scheduled_at', start).lte('scheduled_at', end);
+    const { data: booked } = await q;
+    const takenHours = new Set((booked ?? []).map((b: any) => new Date(b.scheduled_at).getUTCHours()));
+    // Build available slots (hourly for now)
+    const slots: string[] = [];
+    for (let h = effectiveOpen; h < effectiveClose; h++) {
+      if (!takenHours.has(h)) {
+        slots.push(`${String(h).padStart(2, '0')}:00`);
+      }
+    }
+    jsonOk(res, { slots, blocked: false, openHour: effectiveOpen, closeHour: effectiveClose });
+  },
+
+  // ── Phase 3: Staff for booking (which staff can do this service?) ─────────
+
+  'booking-staff': async (req, res) => {
+    const { serviceId, date } = req.query ?? {};
+    if (!serviceId) return res.status(400).json({ error: 'Missing serviceId' });
+    // Get assigned staff for this service
+    const { data: links } = await supabaseAdmin.from('service_staff').select('staff_id').eq('service_id', serviceId);
+    const staffIds = (links ?? []).map((l: any) => l.staff_id);
+    if (!staffIds.length) return jsonOk(res, { staff: [] });
+    const { data: staff } = await supabaseAdmin.from('staff').select('id, name, name_ar, title, title_ar, avatar_url').in('id', staffIds).eq('is_active', true).order('sort_order');
+    // If date provided, filter out staff blocked on that date
+    if (date && staff?.length) {
+      const { data: blocked } = await supabaseAdmin.from('staff_blocked_dates').select('staff_id').in('staff_id', staffIds).eq('blocked_date', date as string);
+      const blockedSet = new Set((blocked ?? []).map((b: any) => b.staff_id));
+      const available = (staff ?? []).filter((s: any) => !blockedSet.has(s.id));
+      return jsonOk(res, { staff: available });
+    }
+    jsonOk(res, { staff: staff ?? [] });
+  },
+
+  // ── Phase 3: Coupon management ───────────────────────────────────────────
+
+  'coupon-list': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+    // Admins can pass centerId
+    const roles = await supabaseAdmin.from('user_roles').select('role').eq('user_id', userId);
+    const isAdmin = (roles.data ?? []).some((r: any) => r.role === 'admin' || r.role === 'super_admin');
+    let q = supabaseAdmin.from('coupons').select('*').order('created_at', { ascending: false });
+    if (!isAdmin) {
+      if (!center) return jsonOk(res, { coupons: [] });
+      q = q.eq('center_id', center.id);
+    }
+    const { data } = await q;
+    jsonOk(res, { coupons: data ?? [] });
+  },
+
+  'coupon-upsert': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+    if (!center) throw new Error('Forbidden');
+    const { id, code, description, discount_type, discount_value, min_booking_amount, max_uses, valid_until, is_active } = req.body ?? {};
+    if (!code || !discount_type || !discount_value) return res.status(400).json({ error: 'Missing fields' });
+    const payload = { center_id: center.id, code: (code as string).toUpperCase().trim(), description: description || null, discount_type, discount_value: Number(discount_value), min_booking_amount: Number(min_booking_amount ?? 0), max_uses: max_uses ? Number(max_uses) : null, valid_until: valid_until || null, is_active: is_active !== false };
+    if (id) {
+      const { error } = await supabaseAdmin.from('coupons').update(payload).eq('id', id).eq('center_id', center.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabaseAdmin.from('coupons').insert(payload);
+      if (error) throw new Error(error.message);
+    }
+    jsonOk(res, { ok: true });
+  },
+
+  'coupon-delete': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    const { id } = req.body ?? {};
+    if (!id) return res.status(400).json({ error: 'Missing id' });
+    const { data: center } = await supabaseAdmin.from('centers').select('id').eq('owner_id', userId).maybeSingle();
+    if (!center) throw new Error('Forbidden');
+    const { error } = await supabaseAdmin.from('coupons').delete().eq('id', id).eq('center_id', center.id);
+    if (error) throw new Error(error.message);
+    jsonOk(res, { ok: true });
+  },
+
+  'coupon-validate': async (req, res) => {
+    const { code, centerId, bookingAmount } = req.body ?? {};
+    if (!code) return res.status(400).json({ error: 'Missing code' });
+    const now = new Date().toISOString();
+    let q = supabaseAdmin.from('coupons').select('*').eq('code', (code as string).toUpperCase().trim()).eq('is_active', true).lte('valid_from', now);
+    if (centerId) q = q.or(`center_id.eq.${centerId},center_id.is.null`);
+    else q = q.is('center_id', null);
+    const { data: coupons } = await q;
+    const coupon = (coupons ?? []).find((c: any) => {
+      if (c.valid_until && new Date(c.valid_until) < new Date()) return false;
+      if (c.max_uses !== null && c.uses_count >= c.max_uses) return false;
+      if (bookingAmount && Number(bookingAmount) < c.min_booking_amount) return false;
+      return true;
+    });
+    if (!coupon) return jsonOk(res, { valid: false });
+    const discount = coupon.discount_type === 'percent'
+      ? Math.round((Number(bookingAmount ?? 0) * coupon.discount_value / 100) * 100) / 100
+      : Math.min(coupon.discount_value, Number(bookingAmount ?? 0));
+    jsonOk(res, { valid: true, coupon: { id: coupon.id, code: coupon.code, discount_type: coupon.discount_type, discount_value: coupon.discount_value, discount }, });
+  },
+
+  // ── Phase 3: Admin review moderation ─────────────────────────────────────
+
+  'admin-reviews': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    await assertAdmin(userId);
+    const { centerId, visible } = req.query ?? {};
+    let q = supabaseAdmin.from('reviews').select('id, rating, comment, created_at, customer_id, center_id, booking_id, is_visible, moderation_note').order('created_at', { ascending: false }).limit(200);
+    if (centerId) q = q.eq('center_id', centerId);
+    if (visible === 'false') q = q.eq('is_visible', false);
+    const { data: reviews } = await q;
+    const centerIds = Array.from(new Set((reviews ?? []).map((r: any) => r.center_id)));
+    const customerIds = Array.from(new Set((reviews ?? []).map((r: any) => r.customer_id)));
+    const [{ data: centers }, { data: profiles }] = await Promise.all([
+      centerIds.length ? supabaseAdmin.from('centers').select('id, name, slug').in('id', centerIds) : Promise.resolve({ data: [] }),
+      customerIds.length ? supabaseAdmin.from('profiles').select('id, full_name, email').in('id', customerIds) : Promise.resolve({ data: [] }),
+    ]);
+    const cMap = new Map((centers ?? []).map((c: any) => [c.id, c]));
+    const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+    const enriched = (reviews ?? []).map((r: any) => ({
+      ...r,
+      center_name: (cMap.get(r.center_id) as any)?.name ?? '—',
+      customer_name: (pMap.get(r.customer_id) as any)?.full_name || (pMap.get(r.customer_id) as any)?.email || 'Customer',
+    }));
+    jsonOk(res, { reviews: enriched });
+  },
+
+  'admin-review-moderate': async (req, res) => {
+    const userId = await getAuthUserId(req.headers.authorization);
+    await assertAdmin(userId);
+    const { id, is_visible, moderation_note } = req.body ?? {};
+    if (!id) return res.status(400).json({ error: 'Missing id' });
+    const { error } = await supabaseAdmin.from('reviews').update({ is_visible, moderation_note: moderation_note || null }).eq('id', id);
+    if (error) throw new Error(error.message);
+    jsonOk(res, { ok: true });
+  },
 };
 
 // ── dispatcher ────────────────────────────────────────────────────────────
